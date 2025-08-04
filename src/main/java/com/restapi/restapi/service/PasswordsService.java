@@ -1,5 +1,6 @@
-package com.restapi.restapi.dto;
+package com.restapi.restapi.service;
 
+import com.restapi.restapi.dto.PasswordsDTO;
 import com.restapi.restapi.model.Passwords;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;

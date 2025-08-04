@@ -2,7 +2,7 @@ package com.restapi.restapi.controller;
 
 import com.restapi.restapi.model.Passwords;
 import com.restapi.restapi.dto.PasswordsDTO;
-import com.restapi.restapi.dto.PasswordsService;
+import com.restapi.restapi.service.PasswordsService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
