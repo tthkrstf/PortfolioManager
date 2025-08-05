@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 
 @RestController
@@ -88,5 +89,9 @@ public class PasswordsController {
         boolean success = passwordsService.deletePasswordsOlderThan(years);
         return success ? ResponseEntity.ok("Deleted all passwords that were older than " + years + " years!") :
                 ResponseEntity.ok("No passwords were found that are older than " + years + " years!");
+    }
+    @GetMapping("/greeting")
+    public Map<String, String> getGreeting(){
+        return Map.of("message", "Hello from the backend!asdasd");
     }
 }
