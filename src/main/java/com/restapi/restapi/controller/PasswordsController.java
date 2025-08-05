@@ -1,10 +1,13 @@
 package com.restapi.restapi.controller;
 
+import com.restapi.restapi.client.FinanceDataProvider;
+import com.restapi.restapi.dto.QuoteDTO;
 import com.restapi.restapi.model.Passwords;
 import com.restapi.restapi.dto.PasswordsDTO;
+import com.restapi.restapi.service.FinanceDataService;
 import com.restapi.restapi.service.PasswordsService;
 import jakarta.validation.Valid;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -19,17 +22,27 @@ import java.util.List;
 public class PasswordsController {
 
     private final PasswordsService passwordsService;
+    private final FinanceDataService finService;
 
-    @Autowired
-    public PasswordsController(PasswordsService passwordsService){
+    public PasswordsController(final PasswordsService passwordsService, final FinanceDataService finService){
         this.passwordsService = passwordsService;
+        this.finService = finService;
+    }
+
+    @GetMapping("/quote_example/{symbol}")
+    public ResponseEntity<QuoteDTO> getQuote(@PathVariable String symbol){
+        QuoteDTO quoteDTO = finService.getQuote(symbol);
+        return ResponseEntity.ok(quoteDTO);
     }
 
     @GetMapping("/passwords/{id}")
     public ResponseEntity<Passwords> getPassword(@PathVariable int id){
-            Passwords password = passwordsService.getPassword(id);
 
-            return password != null ? ResponseEntity.ok(password) : ResponseEntity.notFound().build();
+        QuoteDTO quoteDTO = finService.getQuote("AAPL");
+
+        Passwords password = passwordsService.getPassword(id);
+
+        return password != null ? ResponseEntity.ok(password) : ResponseEntity.notFound().build();
     }
 
     @GetMapping("/passwords")
