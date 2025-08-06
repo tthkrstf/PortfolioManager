@@ -69,8 +69,8 @@ public class FinanceDataService {
         if(quoteDTO.getOpenPriceOfDay() != 0) existing.setOpenPriceOfDay(quoteDTO.getOpenPriceOfDay());
         if(quoteDTO.getPrevClosePrice() != 0) existing.setPrevClosePrice(quoteDTO.getPrevClosePrice());
 
-        String sql = "UPDATE quote set currentPrice = ?, changes = ?, percentChange = ?, highPriceOfDay = ?, lowPriceOfDay = ?, openPriceOfDay = ?," +
-                "prevClosePrice = ? where symbol = ?";
+        String sql = "UPDATE quote set currentPrice = ?, changes = ?, percent_change = ?, high_price_of_day = ?, low_price_of_day = ?, open_price_of_day = ?," +
+                "prev_close_price = ?, creation_date = CURDATE() where symbol = ?";
         int rows = jdbcTemplate.update(sql, existing.getCurrentPrice(), existing.getChanges(),
                 existing.getPercentChange(), existing.getHighPriceOfDay(), existing.getLowPriceOfDay(), existing.getOpenPriceOfDay(),
                 existing.getPrevClosePrice(), symbol);

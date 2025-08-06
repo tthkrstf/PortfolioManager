@@ -39,7 +39,7 @@ public class FinanceDataController {
                 ResponseEntity.badRequest().body("Inserted failed!");
     }
 
-    @PutMapping("/quotes/{id}")
+    @PutMapping("/quotes/{symbol}")
     public ResponseEntity<String> putQuote(@PathVariable String symbol, @RequestBody QuoteDTO quoteDTO){
         boolean success = finService.putQuote(quoteDTO, symbol);
 
@@ -47,10 +47,10 @@ public class FinanceDataController {
                 ResponseEntity.status(HttpStatus.NOT_FOUND).body("No quotes with this symbol!");
     }
 
-    @DeleteMapping("/quotes/{id}")
+    @DeleteMapping("/quotes/{symbol}")
     public ResponseEntity<String> deleteQuote(@PathVariable String symbol){
         boolean success = finService.deleteQuote(symbol);
         return success ? ResponseEntity.ok("Successfully deleted") :
-                ResponseEntity.status(HttpStatus.NOT_FOUND).body("No quote with this id!");
+                ResponseEntity.status(HttpStatus.NOT_FOUND).body("No quote with this symbol!");
     }
 }
