@@ -4,14 +4,14 @@ import lombok.Data;
 
 @Data
 public class QuoteDTO {
-    private String symbol;
-    private double currentPrice;
-    private double changes;
-    private double percentChange;
-    private double highPriceOfDay;
-    private double lowPriceOfDay;
-    private double openPriceOfDay;
-    private double prevClosePrice;
+    private String symbol; // stock
+    private double currentPrice; // current price
+    private double changes; // change
+    private double percentChange; // percent change
+    private double highPriceOfDay; // high
+    private double lowPriceOfDay; // low
+    private double openPriceOfDay; // open
+    private double prevClosePrice; // previous close
 
     public QuoteDTO(String symbol, double currentPrice, double changes, double percentChange, double highPriceOfDay,
                     double lowPriceOfDay, double openPriceOfDay, double prevClosePrice) {
