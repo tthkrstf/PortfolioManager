@@ -3,7 +3,7 @@ package com.restapi.restapi.dto.external.finnhub;
 import lombok.Data;
 
 @Data
-public class FinnhubQuoteRaw {
+public class FinnhubQuoteRaw extends QuoteRaw {
     private double c;   // current price
     private double d;   // change
     private double dp;  // percent change
