@@ -6,9 +6,44 @@ import {getLastPriceUpdates} from './LastPriceUpdates.jsx'
 /*import {AgGridReact} from 'ag-grid-react'
 import {AllCommunityModule, ModuleRegistry} from 'ag-grid-community'*/
 //ModuleRegistry.registerModules([AllCommunityModule]);
-function App() {
 
-  const [data, setData] = useState("");
+function App() {
+    const [data, setData] = useState(null);
+    //Click event for getting the data
+    const handleClick = () => {
+      fetch("http://localhost:8080/quote_example/AAPL")
+        .then((res) => res.json())
+        .then((data) => {
+          setData(data); 
+          console.log(data); 
+        })
+        .catch((err) => console.error(err));
+    };
+    
+    let displayData;
+    let obj;
+    //Checking if we have the data
+    if(data){
+        
+        let jsonString = JSON.stringify(data,null,2);
+        obj = JSON.parse(jsonString);
+        displayData = `${obj.symbol} \n ${obj.currentPrice} \n ${obj.changes} \n ${obj.percentChange} \n ${obj.highPriceOfDay} \n ${obj.openPriceOfDay} \n ${obj.percentChange} \n ${obj.prevClosePrice} `
+    }
+    else{
+        displayData = "No data yet. Cocaine maybe?";
+    }
+  
+    return (
+      <div>
+        <button id="test-button" onClick={handleClick}>Click this if you want to snort cocaine</button>
+        
+        <pre>{displayData}</pre>
+      </div>
+    );
+  
+
+
+
   //useEffect(() =>{setData(getLastPriceUpdates())});
 
   //const colDefs = gridOptions.api.getColumnDefs();
@@ -20,8 +55,8 @@ function App() {
 
     // add the data to the grid
     //gridOptions.api.setRowData('rowData', data);
-    fetch("http://localhost:8080/tasks/greeting").then(asd => asd.json()).then(data => setData(data.message));
-    const socket = new WebSocket('wss://ws.finnhub.io?token=d28sfvpr01qle9gsjho0d28sfvpr01qle9gsjhog');
+    //fetch("http://localhost:8080/tasks/greeting").then(asd => asd.json()).then(data => setData(data.message));
+    /*const socket = new WebSocket('wss://ws.finnhub.io?token=d28sfvpr01qle9gsjho0d28sfvpr01qle9gsjhog');
 
        // Connection opened -> Subscribe
        socket.addEventListener('open', function (event) {
@@ -41,7 +76,7 @@ function App() {
        }
         socket.close();
         console.log(data);
-       return event.data;
+       return event.data;*/
 
 
 }
