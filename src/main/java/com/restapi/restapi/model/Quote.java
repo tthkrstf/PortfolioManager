@@ -1,7 +1,10 @@
 package com.restapi.restapi.model;
 
+import lombok.Data;
+
 import java.util.Date;
 
+@Data
 public class Quote {
     private int id;
     private String symbol;
