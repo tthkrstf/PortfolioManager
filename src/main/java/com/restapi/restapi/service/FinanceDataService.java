@@ -6,6 +6,7 @@ import com.restapi.restapi.dto.QuoteDTO;
 import com.restapi.restapi.dto.external.finnhub.FinnhubQuoteRaw;
 import com.restapi.restapi.mapper.FinnhubQuoteMapper;
 import com.restapi.restapi.model.Passwords;
+import com.restapi.restapi.model.Quote;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -32,9 +33,9 @@ public class FinanceDataService {
             return quoteMapper.map(raw, symbol);
         }
 
-    public List<QuoteDTO> getAllQuotes(){
-        List<QuoteDTO> quotes = jdbcTemplate.query("select * from Quote",
-                new Object[]{}, new BeanPropertyRowMapper<>(QuoteDTO.class));
+    public List<Quote> getAllQuotes(){
+        List<Quote> quotes = jdbcTemplate.query("select * from quote",
+                new Object[]{}, new BeanPropertyRowMapper<>(Quote.class));
 
         return quotes;
     }
@@ -44,9 +45,9 @@ public class FinanceDataService {
         public boolean createQuote(String symbol){
             QuoteDTO quoteDTO = this.getQuote(symbol);
 
-            String sql = "INSERT INTO Quote values(null, ?, ?, ?, ?, " +
+            String sql = "INSERT INTO quote values(null, ?, ?, ?, ?, " +
                     "?, ?, ?, ?, CURDATE(), null)";
-            int rows = jdbcTemplate.update(sql, quoteDTO.getSymbol(), quoteDTO.getPercentChange(),
+            int rows = jdbcTemplate.update(sql, quoteDTO.getSymbol(), quoteDTO.getCurrentPrice(),
                     quoteDTO.getChanges(), quoteDTO.getPercentChange(), quoteDTO.getHighPriceOfDay(),
                     quoteDTO.getLowPriceOfDay(), quoteDTO.getOpenPriceOfDay(), quoteDTO.getPrevClosePrice());
             return rows == 1;
@@ -68,16 +69,18 @@ public class FinanceDataService {
         if(quoteDTO.getOpenPriceOfDay() != 0) existing.setOpenPriceOfDay(quoteDTO.getOpenPriceOfDay());
         if(quoteDTO.getPrevClosePrice() != 0) existing.setPrevClosePrice(quoteDTO.getPrevClosePrice());
 
-        String sql = "UPDATE Quote set currentPrice = ?, changes = ?, percentChange = ?, url = ?, notes = ?, modificationdate = CURDATE() where symbol = ?";
-        int rows = jdbcTemplate.update(sql, existing.getName(), existing.getPassword(),
-                existing.getUrl(), existing.getNotes(), id);
+        String sql = "UPDATE quote set currentPrice = ?, changes = ?, percentChange = ?, highPriceOfDay = ?, lowPriceOfDay = ?, openPriceOfDay = ?," +
+                "prevClosePrice = ? where symbol = ?";
+        int rows = jdbcTemplate.update(sql, existing.getCurrentPrice(), existing.getChanges(),
+                existing.getPercentChange(), existing.getHighPriceOfDay(), existing.getLowPriceOfDay(), existing.getOpenPriceOfDay(),
+                existing.getPrevClosePrice(), symbol);
 
         return rows == 1;
     }
 
     //DELETE
     public boolean deleteQuote(String symbol){
-        String sql = "DELETE FROM Quote where symbol = ?";
+        String sql = "DELETE FROM quote where symbol = ?";
         int rows = jdbcTemplate.update(sql, symbol);
         return rows == 1;
     }
