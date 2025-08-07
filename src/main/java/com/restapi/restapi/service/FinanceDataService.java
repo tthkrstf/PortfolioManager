@@ -8,7 +8,9 @@ import com.restapi.restapi.dto.external.CompanyNewsRaw;
 import com.restapi.restapi.dto.external.QuoteRaw;
 import com.restapi.restapi.dto.external.StockRaw;
 import com.restapi.restapi.mapper.FinnhubMapper;
+import com.restapi.restapi.model.CompanyNews;
 import com.restapi.restapi.model.Quote;
+import com.restapi.restapi.model.Stock;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -108,4 +110,54 @@ public class FinanceDataService {
         List<? extends StockRaw> stockRaws = client.getStocksRaw();
         return finnhubMapper.mapStocks(stockRaws);
     }
+
+    public boolean createStock() {
+        List<StockDTO> stockDTOs = this.getStockRaw();
+
+        String sql = "INSERT INTO stock values(?, ?, ?, ?, " +
+                "?, ?, ?)";
+      for(StockDTO stockDTO: stockDTOs){
+            jdbcTemplate.update(sql, stockDTO.getFigi(), stockDTO.getCurrency(), stockDTO.getDescription(),
+                    stockDTO.getDisplaySymbol(), stockDTO.getMic(), stockDTO.getSymbol(), stockDTO.getType());
+        }
+        return !stockDTOs.isEmpty();
+    }
+
+    public List<Stock> getAllStocks() {
+        List<Stock> stocks = jdbcTemplate.query("select * from stock",
+                new Object[]{}, new BeanPropertyRowMapper<>(Stock.class));
+
+        return stocks;
+    }
+
+    public List<CompanyNews> getAllCompanyNews() {
+        List<CompanyNews> companyNews = jdbcTemplate.query("select * from company_news",
+                new Object[]{}, new BeanPropertyRowMapper<>(CompanyNews.class));
+
+        return companyNews;
+    }
+
+//    public boolean putStock(StockDTO stockDTO, final String symbol){
+//        QuoteDTO existing = getStockRaw(symbol);
+//
+//        if(existing == null){
+//            return false;
+//        }
+//
+//        if(quoteDTO.getCurrentPrice() != 0) existing.setCurrentPrice(quoteDTO.getCurrentPrice());
+//        if(quoteDTO.getChanges() != 0) existing.setChanges(quoteDTO.getChanges());
+//        if(quoteDTO.getPercentChange() != 0) existing.setPercentChange(quoteDTO.getCurrentPrice());
+//        if(quoteDTO.getHighPriceOfDay() != 0) existing.setHighPriceOfDay(quoteDTO.getHighPriceOfDay());
+//        if(quoteDTO.getLowPriceOfDay() != 0) existing.setLowPriceOfDay(quoteDTO.getLowPriceOfDay());
+//        if(quoteDTO.getOpenPriceOfDay() != 0) existing.setOpenPriceOfDay(quoteDTO.getOpenPriceOfDay());
+//        if(quoteDTO.getPrevClosePrice() != 0) existing.setPrevClosePrice(quoteDTO.getPrevClosePrice());
+//
+//        String sql = "UPDATE quote set currentPrice = ?, changes = ?, percent_change = ?, high_price_of_day = ?, low_price_of_day = ?, open_price_of_day = ?," +
+//                "prev_close_price = ?, creation_date = CURDATE() where symbol = ?";
+//        int rows = jdbcTemplate.update(sql, existing.getCurrentPrice(), existing.getChanges(),
+//                existing.getPercentChange(), existing.getHighPriceOfDay(), existing.getLowPriceOfDay(), existing.getOpenPriceOfDay(),
+//                existing.getPrevClosePrice(), symbol);
+//
+//        return rows == 1;
+//    }
 }

@@ -2,7 +2,10 @@ package com.restapi.restapi.controller;
 
 import com.restapi.restapi.dto.CompanyNewsDTO;
 import com.restapi.restapi.dto.QuoteDTO;
+import com.restapi.restapi.dto.StockDTO;
+import com.restapi.restapi.model.CompanyNews;
 import com.restapi.restapi.model.Quote;
+import com.restapi.restapi.model.Stock;
 import com.restapi.restapi.service.FinanceDataService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -19,7 +22,7 @@ public class FinanceDataController {
         this.finService = finService;
     }
 
-    @GetMapping("/quote_example/{symbol}")
+    @GetMapping("/quote/{symbol}")
     public ResponseEntity<QuoteDTO> getQuote(@PathVariable String symbol){
         QuoteDTO quoteDTO = finService.getQuote(symbol);
         return ResponseEntity.ok(quoteDTO);
@@ -56,10 +59,19 @@ public class FinanceDataController {
     }
 
 
+    //Company News
+
     @GetMapping("/company_news/{symbol}")
     public ResponseEntity<List<CompanyNewsDTO>> getCompanyNews(@PathVariable String symbol){
         List<CompanyNewsDTO> companyNewsDTO = finService.getCompanyNews(symbol);
         return ResponseEntity.ok(companyNewsDTO);
+    }
+
+    @GetMapping("/company_news")
+    public ResponseEntity<List<CompanyNews>> getCompanyNews(){
+        List<CompanyNews> news = finService.getAllCompanyNews();
+
+        return news.isEmpty() ? ResponseEntity.noContent().build() : ResponseEntity.ok(news);
     }
 
     @PostMapping("/company_news")
@@ -69,4 +81,34 @@ public class FinanceDataController {
         return success ? ResponseEntity.ok("Successfully inserted " + symbol + " symbol!") :
                 ResponseEntity.badRequest().body("Inserted failed!");
     }
+
+    //Stock
+    @PostMapping("/stock")
+    public ResponseEntity<String> postStock(){
+        boolean success = finService.createStock();
+
+        return success ? ResponseEntity.ok("Successfully inserted stock!") :
+                ResponseEntity.badRequest().body("Inserted failed!");
+    }
+
+    @GetMapping("/stock/{symbol}")
+    public ResponseEntity<List<StockDTO>> getStock(@PathVariable String symbol){
+        List<StockDTO> stockDTOS = finService.getStockRaw();
+        return ResponseEntity.ok(stockDTOS);
+    }
+
+    @GetMapping("/stocks")
+    public ResponseEntity<List<Stock>> getStocks(){
+        List<Stock> stocks = finService.getAllStocks();
+
+        return stocks.isEmpty() ? ResponseEntity.noContent().build() : ResponseEntity.ok(stocks);
+    }
+
+//    @PutMapping("/stocks/{symbol}")
+//    public ResponseEntity<String> putStock(@PathVariable String symbol, @RequestBody StockDTO stockDTO){
+//        boolean success = finService.putStock(stockDTO, symbol);
+//
+//        return success ? ResponseEntity.ok("Successfully done the update!") :
+//                ResponseEntity.status(HttpStatus.NOT_FOUND).body("No stocks with this symbol!");
+//    }
 }
