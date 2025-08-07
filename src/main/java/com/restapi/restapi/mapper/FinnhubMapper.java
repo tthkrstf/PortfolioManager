@@ -1,11 +1,11 @@
 package com.restapi.restapi.mapper;
 
 import com.restapi.restapi.dto.CompanyNewsDTO;
-import com.restapi.restapi.dto.external.finnhub.CompanyNewsRaw;
+import com.restapi.restapi.dto.external.CompanyNewsRaw;
 import com.restapi.restapi.dto.external.finnhub.FinnhubCompanyNewsRaw;
 import com.restapi.restapi.dto.external.finnhub.FinnhubQuoteRaw;
 import com.restapi.restapi.dto.QuoteDTO;
-import com.restapi.restapi.dto.external.finnhub.QuoteRaw;
+import com.restapi.restapi.dto.external.QuoteRaw;
 import org.springframework.stereotype.Component;
 
 import java.time.Instant;

@@ -1,7 +1,7 @@
 package com.restapi.restapi.client;
 
-import com.restapi.restapi.dto.external.finnhub.CompanyNewsRaw;
-import com.restapi.restapi.dto.external.finnhub.QuoteRaw;
+import com.restapi.restapi.dto.external.CompanyNewsRaw;
+import com.restapi.restapi.dto.external.QuoteRaw;
 
 import java.util.List;
 

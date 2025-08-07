@@ -6,6 +6,7 @@ import com.restapi.restapi.dto.external.finnhub.FinnhubCompanyNewsRaw;
 import com.restapi.restapi.dto.external.finnhub.FinnhubQuoteRaw;
 import com.restapi.restapi.client.FinanceDataProvider;
 import com.restapi.restapi.common.ApiConstants;
+import com.restapi.restapi.dto.external.finnhub.FinnhubStockRaw;
 import okhttp3.HttpUrl;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
@@ -37,7 +38,7 @@ public class FinnhubClient implements FinanceDataProvider {
         HttpUrl url = new HttpUrl.Builder()
                 .scheme("https")
                 .host(ApiConstants.FINNHUB_HOST)
-                .addPathSegments(ApiConstants.QUOTE_PATH)
+                .addPathSegments(ApiConstants.FINNHUB_QUOTE_PATH)
                 .addQueryParameter("symbol", symbol)
                 .addQueryParameter("token", apiKey)
                 .build();
@@ -68,7 +69,6 @@ public class FinnhubClient implements FinanceDataProvider {
     @Override
     public List<FinnhubCompanyNewsRaw> getCompanyNewsRaw(String symbol){
         LocalDate today = LocalDate.now();
-        LocalDate daysAgo = today.minusDays(1);
 
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
@@ -79,7 +79,7 @@ public class FinnhubClient implements FinanceDataProvider {
         HttpUrl url = new HttpUrl.Builder()
                 .scheme("https")
                 .host(ApiConstants.FINNHUB_HOST)
-                .addPathSegments(ApiConstants.COMPANY_NEWS_PATH)
+                .addPathSegments(ApiConstants.FINNHUB_COMPANY_NEWS_PATH)
                 .addQueryParameter("symbol", symbol)
                 .addQueryParameter("from", fromDate)
                 .addQueryParameter("to", toDate)
@@ -106,6 +106,42 @@ public class FinnhubClient implements FinanceDataProvider {
             return objectMapper.readValue(
                     jsonResponse,
                     new TypeReference<List<FinnhubCompanyNewsRaw>>() {}
+            );
+
+        } catch (IOException e) {
+            throw new RuntimeException("Error during API call to Finnhub", e);
+        }
+    }
+
+    public List<FinnhubStockRaw> getStocksRaw(){
+        HttpUrl url = new HttpUrl.Builder()
+                .scheme("https")
+                .host(ApiConstants.FINNHUB_HOST)
+                .addPathSegments(ApiConstants.FINNHUB_STOCK_PATH)
+                .addQueryParameter("exchange", ApiConstants.EXCHANGE_MARKET)
+                .addQueryParameter("token", apiKey)
+                .build();
+
+        Request request = new Request.Builder()
+                .url(url)
+                .addHeader("Accept", "application/json")
+                .addHeader("User-Agent", "PortfolioManager/1.0")
+                .build();
+
+        try (Response response = client.newCall(request).execute()) {
+            if (!response.isSuccessful()) {
+                throw new IOException("Unexpected response code: " + response.code());
+            }
+
+            if (response.body() == null) {
+                throw new IOException("Empty response body from Finnhub");
+            }
+
+            String jsonResponse = response.body().string();
+
+            return objectMapper.readValue(
+                    jsonResponse,
+                    new TypeReference<List<FinnhubStockRaw>>() {}
             );
 
         } catch (IOException e) {
