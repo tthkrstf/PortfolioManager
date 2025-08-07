@@ -14,7 +14,7 @@ import org.springframework.stereotype.Component;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneId;
-import java.util.Date;
+import java.sql.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -81,6 +81,6 @@ public class FinnhubMapper {
                 .atZone(ZoneId.of("UTC"))
                 .toLocalDate();
 
-        return Date.from(datetime.atStartOfDay(ZoneId.of("UTC")).toInstant());
+        return Date.valueOf(datetime);
     }
 }
