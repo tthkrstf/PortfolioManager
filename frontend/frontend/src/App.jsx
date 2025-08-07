@@ -6,6 +6,7 @@ import {getLastPriceUpdates} from './LastPriceUpdates.jsx';
 import Button from '@mui/material/Button';
 import {pieArcLabelClasses, PieChart} from '@mui/x-charts/PieChart';
 import { BarChart } from '@mui/x-charts/BarChart';
+import'./barChartStyle.css'
 /*import {AgGridReact} from 'ag-grid-react'
 import {AllCommunityModule, ModuleRegistry} from 'ag-grid-community'*/
 //ModuleRegistry.registerModules([AllCommunityModule]);
@@ -48,6 +49,7 @@ function App() {
   
     return (
       <div class="site-container">
+      <div class="pie-container">
         {/*<Button variant="outlined" onClick={handleClick}>Click this if you want to snort cocaine</Button> */}
         <p class="title-style">Current stock holdings</p>
          <PieChart series={[{data:mockData}]} width={200} height={200} sx={{
@@ -55,9 +57,24 @@ function App() {
             animationDirection: 'alternate'}, [`& .${pieArcLabelClasses.root}.${pieArcLabelClasses.animate}`]: {animationDuration: '5s'}
 
          }} slotProps={{legend: {direction: 'horizontal', position:{vertical: 'bottom', horizontal: 'center'} }}} />
-        
+          
        {/*<pre>{displayData}</pre>*/ } 
         
+      </div>
+      
+      <div class="bar-container">
+      <p class="title-style">Quotes</p>
+      <BarChart
+          yAxis={[{ scaleType: 'band', data: ['Bier', 'Vodka B', 'Whiskey'] }]}
+          series={[{ data: [4, 3, 5] }, { data: [1, 6, 3] }, { data: [2, 5, 6] }]}
+          height={300}
+          width={700}
+          layout="horizontal"
+          grid={{vertical: true}}
+          
+          
+/>
+         </div>
       </div>
     );
   
