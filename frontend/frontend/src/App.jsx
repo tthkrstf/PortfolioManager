@@ -71,6 +71,7 @@ function App() {
           width={700}
           layout="horizontal"
           grid={{vertical: true}}
+          borderRadius={5}
           
           
 />
