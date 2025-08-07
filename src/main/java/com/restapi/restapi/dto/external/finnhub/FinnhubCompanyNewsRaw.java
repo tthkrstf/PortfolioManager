@@ -1,5 +1,6 @@
 package com.restapi.restapi.dto.external.finnhub;
 
+import com.restapi.restapi.dto.external.CompanyNewsRaw;
 import lombok.Data;
 
 @Data
