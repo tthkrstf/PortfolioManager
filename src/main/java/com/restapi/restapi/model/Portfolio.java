@@ -12,4 +12,5 @@ public class Portfolio {
     private double shares; // Number of shares purchased
     private double totalPrice; // Total price paid = pricePerShare * shares
     private Date purchaseDate; // Purchase date
+    private String figi; // Figi ID number for a stock
 }
