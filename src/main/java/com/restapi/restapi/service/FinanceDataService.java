@@ -6,7 +6,6 @@ import com.restapi.restapi.dto.QuoteDTO;
 import com.restapi.restapi.dto.external.finnhub.CompanyNewsRaw;
 import com.restapi.restapi.dto.external.finnhub.QuoteRaw;
 import com.restapi.restapi.mapper.FinnhubMapper;
-import com.restapi.restapi.dto.external.finnhub.FinnhubQuoteRaw;
 import com.restapi.restapi.model.Quote;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
