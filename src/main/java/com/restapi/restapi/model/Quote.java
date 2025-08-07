@@ -6,7 +6,6 @@ import java.util.Date;
 
 @Data
 public class Quote {
-    private int id;
     private String symbol;
     private double currentPrice;
     private double changes;

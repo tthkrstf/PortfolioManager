@@ -46,7 +46,7 @@ public class FinanceDataService {
     public boolean createQuote(String symbol){
         QuoteDTO quoteDTO = this.getQuote(symbol);
 
-            String sql = "INSERT INTO quote values(null, ?, ?, ?, ?, " +
+            String sql = "INSERT INTO quote values(?, ?, ?, ?, " +
                 "?, ?, ?, ?, CURDATE(), null)";
             int rows = jdbcTemplate.update(sql, quoteDTO.getSymbol(), quoteDTO.getCurrentPrice(),
                 quoteDTO.getChanges(), quoteDTO.getPercentChange(), quoteDTO.getHighPriceOfDay(),
@@ -89,6 +89,19 @@ public class FinanceDataService {
     public List<CompanyNewsDTO> getCompanyNews(String symbol){
         List<? extends CompanyNewsRaw> companyNewsRaws = client.getCompanyNewsRaw(symbol);
         return finnhubMapper.mapNews(companyNewsRaws, symbol);
+    }
+
+    public boolean createCompanyNews(String symbol){
+        List<CompanyNewsDTO> companyNewsDTO = this.getCompanyNews(symbol);
+
+        String sql = "INSERT INTO company_news values(?, ?, ?, ?, ?, " +
+                "?, ?, ?, ?)";
+        for(CompanyNewsDTO newsDTO: companyNewsDTO){
+            jdbcTemplate.update(sql, newsDTO.getId(), newsDTO.getRelated(), newsDTO.getCategory(), newsDTO.getDatetime(),
+                    newsDTO.getHeadline(), newsDTO.getImage(), newsDTO.getSource(),
+                    newsDTO.getSummary(), newsDTO.getUrl());
+        }
+        return !companyNewsDTO.isEmpty();
     }
 
     public List<StockDTO> getStockRaw(){

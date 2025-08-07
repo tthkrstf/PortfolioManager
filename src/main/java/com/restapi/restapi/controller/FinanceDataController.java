@@ -1,5 +1,6 @@
 package com.restapi.restapi.controller;
 
+import com.restapi.restapi.dto.CompanyNewsDTO;
 import com.restapi.restapi.dto.QuoteDTO;
 import com.restapi.restapi.model.Quote;
 import com.restapi.restapi.service.FinanceDataService;
@@ -52,5 +53,20 @@ public class FinanceDataController {
         boolean success = finService.deleteQuote(symbol);
         return success ? ResponseEntity.ok("Successfully deleted") :
                 ResponseEntity.status(HttpStatus.NOT_FOUND).body("No quote with this symbol!");
+    }
+
+
+    @GetMapping("/company_news/{symbol}")
+    public ResponseEntity<List<CompanyNewsDTO>> getCompanyNews(@PathVariable String symbol){
+        List<CompanyNewsDTO> companyNewsDTO = finService.getCompanyNews(symbol);
+        return ResponseEntity.ok(companyNewsDTO);
+    }
+
+    @PostMapping("/company_news")
+    public ResponseEntity<String> postCompanyNews(@RequestParam String symbol){
+        boolean success = finService.createCompanyNews(symbol);
+
+        return success ? ResponseEntity.ok("Successfully inserted " + symbol + " symbol!") :
+                ResponseEntity.badRequest().body("Inserted failed!");
     }
 }

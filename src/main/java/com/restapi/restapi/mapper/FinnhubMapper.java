@@ -39,6 +39,7 @@ public class FinnhubMapper {
                     FinnhubCompanyNewsRaw finnRaw = (FinnhubCompanyNewsRaw) raw;
 
                     return new CompanyNewsDTO(
+                            finnRaw.getId(),
                             finnRaw.getCategory(),
                             formatDate(finnRaw.getDatetime()),
                             finnRaw.getHeadline(),
