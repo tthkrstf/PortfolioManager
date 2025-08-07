@@ -2,6 +2,7 @@ package com.restapi.restapi.service;
 
 import com.restapi.restapi.client.FinanceDataProvider;
 import com.restapi.restapi.dto.CompanyNewsDTO;
+import com.restapi.restapi.dto.PortfolioDTO;
 import com.restapi.restapi.dto.QuoteDTO;
 import com.restapi.restapi.dto.StockDTO;
 import com.restapi.restapi.dto.external.CompanyNewsRaw;
@@ -9,9 +10,11 @@ import com.restapi.restapi.dto.external.QuoteRaw;
 import com.restapi.restapi.dto.external.StockRaw;
 import com.restapi.restapi.mapper.FinnhubMapper;
 import com.restapi.restapi.model.CompanyNews;
+import com.restapi.restapi.model.Portfolio;
 import com.restapi.restapi.model.Quote;
 import com.restapi.restapi.model.Stock;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.BatchPreparedStatementSetter;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -19,6 +22,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 
+import javax.sound.sampled.Port;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.Arrays;
@@ -174,9 +178,37 @@ public class FinanceDataService {
     }
 
     public Stock getStockBySymbol(String symbol){
-        String sql = "select * from stock where symbol = ?";
-        List<Stock> stocks = jdbcTemplate.query(sql, new Object[]{symbol}, new BeanPropertyRowMapper<>());
-        return stocks.isEmpty() ? null : stocks.get(0);
+        try{
+            String sql = "select * from stock where symbol = ?";
+            return jdbcTemplate.queryForObject(sql, new Object[]{symbol}, new BeanPropertyRowMapper<>(Stock.class));
+        } catch(EmptyResultDataAccessException e){
+            return null;
+        }
     }
 
+
+    public boolean createPortfolio(PortfolioDTO portfolioDTO){
+        QuoteDTO quote = getQuote(portfolioDTO.getSymbol());
+        Stock stock = getStockBySymbol(portfolioDTO.getSymbol());
+
+        if(stock == null){
+            return false;
+        }
+
+        double currentPrice = quote.getCurrentPrice();
+        double shares = portfolioDTO.getShares();
+
+        String sql = "INSERT IGNORE INTO portfolio values(null, ?, ?, ?, ?, ?, ?)";
+        int rows = jdbcTemplate.update(sql, portfolioDTO.getSymbol(), currentPrice,
+                shares, shares * currentPrice, portfolioDTO.getPurchaseDate(),
+                stock.getFigi()
+        );
+        return rows == 1;
+    }
+
+    public List<Portfolio> getAllFromPortfolio() {
+        String sql = "select * from portfolio";
+        List<Portfolio> portfolio = jdbcTemplate.query(sql, new Object[]{}, new BeanPropertyRowMapper<>(Portfolio.class));
+        return portfolio.isEmpty() ? null : portfolio;
+    }
 }

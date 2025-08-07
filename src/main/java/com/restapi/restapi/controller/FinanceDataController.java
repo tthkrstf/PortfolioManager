@@ -1,9 +1,11 @@
 package com.restapi.restapi.controller;
 
 import com.restapi.restapi.dto.CompanyNewsDTO;
+import com.restapi.restapi.dto.PortfolioDTO;
 import com.restapi.restapi.dto.QuoteDTO;
 import com.restapi.restapi.dto.StockDTO;
 import com.restapi.restapi.model.CompanyNews;
+import com.restapi.restapi.model.Portfolio;
 import com.restapi.restapi.model.Quote;
 import com.restapi.restapi.model.Stock;
 import com.restapi.restapi.service.FinanceDataService;
@@ -11,6 +13,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.sound.sampled.Port;
 import java.util.List;
 
 @RestController
@@ -102,5 +105,20 @@ public class FinanceDataController {
         List<Stock> stocks = finService.getAllStocks();
 
         return stocks.isEmpty() ? ResponseEntity.noContent().build() : ResponseEntity.ok(stocks);
+    }
+
+    @PostMapping("/portfolio")
+    public ResponseEntity<String> postPortfolio(@RequestBody PortfolioDTO portfolioDTO){
+        boolean success = finService.createPortfolio(portfolioDTO);
+
+        return success ? ResponseEntity.ok("Successfully inserted stock into the portfolio!") :
+                ResponseEntity.badRequest().body("Inserted failed!");
+    }
+
+    @GetMapping("/portfolio")
+    public ResponseEntity<List<Portfolio>> getPortfolio(){
+        List<Portfolio> portfolio = finService.getAllFromPortfolio();
+
+        return portfolio.isEmpty() ? ResponseEntity.noContent().build() : ResponseEntity.ok(portfolio);
     }
 }
