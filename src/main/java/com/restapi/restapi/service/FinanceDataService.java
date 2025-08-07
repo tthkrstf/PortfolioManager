@@ -172,4 +172,11 @@ public class FinanceDataService {
 
         return companyNews;
     }
+
+    public Stock getStockBySymbol(String symbol){
+        String sql = "select * from stock where symbol = ?";
+        List<Stock> stocks = jdbcTemplate.query(sql, new Object[]{symbol}, new BeanPropertyRowMapper<>());
+        return stocks.isEmpty() ? null : stocks.get(0);
+    }
+
 }
