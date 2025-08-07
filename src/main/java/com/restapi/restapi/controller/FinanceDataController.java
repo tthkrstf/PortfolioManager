@@ -40,7 +40,7 @@ public class FinanceDataController {
         boolean success = finService.createQuote(symbol);
 
         return success ? ResponseEntity.ok("Successfully inserted " + symbol + " symbol!") :
-                ResponseEntity.badRequest().body("Inserted failed!");
+                ResponseEntity.badRequest().body("Inserted failed, quote " + symbol + " already exists for current day!");
     }
 
     @PutMapping("/quotes/{symbol}")
@@ -79,7 +79,7 @@ public class FinanceDataController {
         boolean success = finService.createCompanyNews(symbol);
 
         return success ? ResponseEntity.ok("Successfully inserted " + symbol + " symbol!") :
-                ResponseEntity.badRequest().body("Inserted failed!");
+                ResponseEntity.badRequest().body("Inserted failed, all news exist already!");
     }
 
     //Stock

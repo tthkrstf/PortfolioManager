@@ -2,7 +2,7 @@ package com.restapi.restapi.dto;
 
 import lombok.Data;
 
-import java.util.Date;
+import java.sql.Date;
 
 @Data
 public class CompanyNewsDTO {
