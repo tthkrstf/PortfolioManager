@@ -1,14 +1,18 @@
 import { useEffect, useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
-import {getLastPriceUpdates} from './LastPriceUpdates.jsx'
+import reactLogo from './assets/react.svg';
+import viteLogo from '/vite.svg';
+import './App.css';
+import {getLastPriceUpdates} from './LastPriceUpdates.jsx';
+import Button from '@mui/material/Button';
+import {pieArcLabelClasses, PieChart} from '@mui/x-charts/PieChart';
+import { BarChart } from '@mui/x-charts/BarChart';
 /*import {AgGridReact} from 'ag-grid-react'
 import {AllCommunityModule, ModuleRegistry} from 'ag-grid-community'*/
 //ModuleRegistry.registerModules([AllCommunityModule]);
 
 function App() {
     const [data, setData] = useState(null);
+    const [pie, showPie] = useState(null);
     //Click event for getting the data
     const handleClick = () => {
       fetch("http://localhost:8080/quote_example/AAPL")
@@ -20,9 +24,17 @@ function App() {
         .catch((err) => console.error(err));
     };
     
+   
     let displayData;
     let obj;
-    //Checking if we have the data
+    //Checking if we have the date
+    const bier = {id:0, value: 100, label: "Beer"};
+    const meth = {id:1,value: 50, label:"Vodka "};
+    const whiskey = {id:2,value: 25 ,label: "Whiskey"};
+    const mead = {id:3, value: 75, label: "Mead"}
+    const mockData = [bier, meth, whiskey, mead];
+    
+    
     if(data){
         
         let jsonString = JSON.stringify(data,null,2);
@@ -32,12 +44,20 @@ function App() {
     else{
         displayData = "No data yet. Cocaine maybe?";
     }
+   
   
     return (
-      <div>
-        <button id="test-button" onClick={handleClick}>Click this if you want to snort cocaine</button>
+      <div class="site-container">
+        {/*<Button variant="outlined" onClick={handleClick}>Click this if you want to snort cocaine</Button> */}
+        <p class="title-style">Current stock holdings</p>
+         <PieChart series={[{data:mockData}]} width={200} height={200} sx={{
+          [`& .${pieArcLabelClasses.root}`]:{filter:'drop-shadow(1px 1px 2px black', animationName: 'animate-pie-arc-label', animationTimingFunction: 'linear', animationIterationCount: 'infinite', 
+            animationDirection: 'alternate'}, [`& .${pieArcLabelClasses.root}.${pieArcLabelClasses.animate}`]: {animationDuration: '5s'}
+
+         }} slotProps={{legend: {direction: 'horizontal', position:{vertical: 'bottom', horizontal: 'center'} }}} />
         
-        <pre>{displayData}</pre>
+       {/*<pre>{displayData}</pre>*/ } 
+        
       </div>
     );
   
