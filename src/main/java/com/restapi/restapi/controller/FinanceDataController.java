@@ -103,12 +103,4 @@ public class FinanceDataController {
 
         return stocks.isEmpty() ? ResponseEntity.noContent().build() : ResponseEntity.ok(stocks);
     }
-
-//    @PutMapping("/stocks/{symbol}")
-//    public ResponseEntity<String> putStock(@PathVariable String symbol, @RequestBody StockDTO stockDTO){
-//        boolean success = finService.putStock(stockDTO, symbol);
-//
-//        return success ? ResponseEntity.ok("Successfully done the update!") :
-//                ResponseEntity.status(HttpStatus.NOT_FOUND).body("No stocks with this symbol!");
-//    }
 }
