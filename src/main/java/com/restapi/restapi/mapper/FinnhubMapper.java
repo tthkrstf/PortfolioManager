@@ -1,11 +1,14 @@
 package com.restapi.restapi.mapper;
 
 import com.restapi.restapi.dto.CompanyNewsDTO;
+import com.restapi.restapi.dto.StockDTO;
 import com.restapi.restapi.dto.external.CompanyNewsRaw;
+import com.restapi.restapi.dto.external.StockRaw;
 import com.restapi.restapi.dto.external.finnhub.FinnhubCompanyNewsRaw;
 import com.restapi.restapi.dto.external.finnhub.FinnhubQuoteRaw;
 import com.restapi.restapi.dto.QuoteDTO;
 import com.restapi.restapi.dto.external.QuoteRaw;
+import com.restapi.restapi.dto.external.finnhub.FinnhubStockRaw;
 import org.springframework.stereotype.Component;
 
 import java.time.Instant;
@@ -48,6 +51,29 @@ public class FinnhubMapper {
                 })
                 .collect(Collectors.toList());
     }
+
+    public List<StockDTO> mapStocks(List<? extends StockRaw> stockRaws) {
+        if (!stockRaws.isEmpty() && !(stockRaws.get(0) instanceof FinnhubStockRaw)) {
+            throw new IllegalArgumentException("Expected FinnhubStockRaw elements");
+        }
+
+        return stockRaws.stream()
+                .map(raw -> {
+                    FinnhubStockRaw finnRaw = (FinnhubStockRaw) raw;
+
+                    return new StockDTO(
+                            finnRaw.getFigi(),
+                            finnRaw.getSymbol(),
+                            finnRaw.getDisplaySymbol(),
+                            finnRaw.getDescription(),
+                            finnRaw.getMic(),
+                            finnRaw.getCurrency(),
+                            finnRaw.getType()
+                    );
+                })
+                .collect(Collectors.toList());
+    }
+
 
     private Date formatDate(long date){
         LocalDate datetime = Instant.ofEpochSecond(date)

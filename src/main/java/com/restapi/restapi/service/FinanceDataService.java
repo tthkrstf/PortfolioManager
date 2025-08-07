@@ -3,6 +3,7 @@ package com.restapi.restapi.service;
 import com.restapi.restapi.client.FinanceDataProvider;
 import com.restapi.restapi.dto.CompanyNewsDTO;
 import com.restapi.restapi.dto.QuoteDTO;
+import com.restapi.restapi.dto.StockDTO;
 import com.restapi.restapi.dto.external.CompanyNewsRaw;
 import com.restapi.restapi.dto.external.QuoteRaw;
 import com.restapi.restapi.dto.external.StockRaw;
@@ -88,5 +89,10 @@ public class FinanceDataService {
     public List<CompanyNewsDTO> getCompanyNews(String symbol){
         List<? extends CompanyNewsRaw> companyNewsRaws = client.getCompanyNewsRaw(symbol);
         return finnhubMapper.mapNews(companyNewsRaws, symbol);
+    }
+
+    public List<StockDTO> getStockRaw(){
+        List<? extends StockRaw> stockRaws = client.getStocksRaw();
+        return finnhubMapper.mapStocks(stockRaws);
     }
 }
