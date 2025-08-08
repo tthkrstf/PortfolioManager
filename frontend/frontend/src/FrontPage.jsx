@@ -8,7 +8,7 @@ import { AllCommunityModule, ModuleRegistry} from 'ag-grid-community';
 ModuleRegistry.registerModules([AllCommunityModule]);
 import {AgGridReact} from 'ag-grid-react';
 import {AssetTable} from './AssetTable.jsx';
-import {Link} from "react-router";
+//import {Link} from "react-router";
 
 
 function FrontPage() {
@@ -48,6 +48,9 @@ function FrontPage() {
         setSelectedAsset({});
         setRowData([]);
         };
+    const onAddAssetClick = () => {
+            console.log("hello");
+            };
 
     const companyNames = Object.keys(companyDummyData);
 

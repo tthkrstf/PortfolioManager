@@ -6,6 +6,9 @@ import {getLastPriceUpdates} from './LastPriceUpdates.jsx';
 import Button from '@mui/material/Button';
 import {Charts} from './Charts.jsx';
 import {FrontPage} from './FrontPage.jsx';
+import ReactDOM from "react-dom/client";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
+import {Layout} from './Layout';
 
 
 function App() {
@@ -45,9 +48,15 @@ function App() {
    
   
     return (
-        <Charts mockData={mockData} ></Charts>
-        <FrontPage/>
-
+        <BrowserRouter>
+              <Routes>
+                <Route path="/" element={<Layout />}>
+                  <Route index element={<Charts mockData={mockData} />} />
+                  <Route path="assettable" element={<FrontPage/>} />
+                  <Route path="addasset" element={<AddAsset/>} />
+                </Route>
+              </Routes>
+            </BrowserRouter>
     );
 }
 
