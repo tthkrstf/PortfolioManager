@@ -12,7 +12,6 @@ public class PortfolioDTO {
     private String symbol; // Stock symbol
     private double shares; // Number of shares purchased
     private double pricePerShare; // Price at the time of buying
-    private Date purchaseDate; // Purchase date
     private String currency; // Currency
     private Transaction type; // Currency
 }

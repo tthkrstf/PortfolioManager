@@ -78,14 +78,6 @@ public class FinanceDataController {
                 ResponseEntity.badRequest().body("Inserted failed!");
     }
 
-    // FROM DB
-    @GetMapping("/stocks")
-    public ResponseEntity<List<Stock>> getStocks(){
-        List<Stock> stocks = finService.getAllStocks();
-
-        return stocks.isEmpty() ? ResponseEntity.noContent().build() : ResponseEntity.ok(stocks);
-    }
-
     // TO DB
     @PostMapping("/portfolio")
     public ResponseEntity<String> postPortfolio(@RequestBody PortfolioDTO portfolioDTO){
