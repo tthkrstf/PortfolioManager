@@ -9,51 +9,52 @@ import {FrontPage} from './FrontPage.jsx';
 import ReactDOM from "react-dom/client";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import {Layout} from './Layout';
+//import {AddAsset} from './AddAsset'
 
-
+function getSymbolInfo( setData){
+  fetch("http://localhost:8080/quotes").then((res) => res.json().then((data) =>{setData(data);
+    
+  }).catch((err) => console.error(err)));
+}
 function App() {
-//     const [data, setData] = useState(null);
-    const [pie, showPie] = useState(null);
-    //Click event for getting the data
-    const handleClick = () => {
-      fetch("http://localhost:8080/quote_example/AAPL")
-        .then((res) => res.json())
-        .then((data) => {
-          setData(data); 
-          console.log(data); 
-        })
-        .catch((err) => console.error(err));
-    };
+  const [data, setData] = useState([]);
+  
+    
+    
+    useEffect( () => getSymbolInfo( setData), []);
     
    
     let displayData;
-    let obj;
-    //Checking if we have the date
-    const bier = {id:0, value: 100, label: "Beer"};
-    const meth = {id:1,value: 50, label:"Vodka "};
-    const whiskey = {id:2,value: 25 ,label: "Whiskey"};
-    const mead = {id:3, value: 75, label: "Mead"}
-    const mockData = [bier, meth, whiskey, mead];
     
-//
-//     if(data){
-//
-//         let jsonString = JSON.stringify(data,null,2);
-//         obj = JSON.parse(jsonString);
-//         displayData = `${obj.symbol} \n ${obj.currentPrice} \n ${obj.changes} \n ${obj.percentChange} \n ${obj.highPriceOfDay} \n ${obj.openPriceOfDay} \n ${obj.percentChange} \n ${obj.prevClosePrice} `
-//     }
-//     else{
-//         displayData = "No data yet. Cocaine maybe?";
-//     }
+    
+    let dataArray = [];
+
+    if(data){
+        for(let i = 0; i < data.length; i++){
+          const quoteObj = {id: i, value: data[i].highPriceOfDay +2, value2: data[i].lowPriceOfDay +4, label: data[i].symbol}
+          dataArray.push(quoteObj);
+        }
+         /*let jsonString = JSON.stringify(data,null,2);
+         console.log(data)
+         obj = JSON.parse(jsonString);
+         displayData = {id:0, value: obj.highPriceOfDay, label: obj.symbol, value2:obj.lowPriceOfDay};*/
+         
+        
+         
+    }
+    else{
+       displayData = "No data yet. Cocaine maybe?";
+   }
    
   
     return (
         <BrowserRouter>
               <Routes>
                 <Route path="/" element={<Layout />}>
-                  <Route index element={<Charts mockData={mockData} />} />
+                  <Route index element={<Charts mockData={dataArray} />} />
                   <Route path="assettable" element={<FrontPage/>} />
-                  <Route path="addasset" element={<AddAsset/>} />
+                  <Route path="frontPage" element={<FrontPage/>}>
+                  </Route>
                 </Route>
               </Routes>
             </BrowserRouter>
