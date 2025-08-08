@@ -1,5 +1,6 @@
 package com.restapi.restapi.model;
 
+import com.restapi.restapi.common.Transaction;
 import lombok.Data;
 
 import java.util.Date;
@@ -10,7 +11,8 @@ public class Portfolio {
     private String symbol; // Stock symbol
     private double pricePerShare; // Price per share at purchase
     private double shares; // Number of shares purchased
-    private double totalPrice; // Total price paid = pricePerShare * shares
     private Date purchaseDate; // Purchase date
-    private String figi; // Figi ID number for a stock
+    private String currency; // Purchase date
+    private Transaction type; // Buy or Sell
 }
+

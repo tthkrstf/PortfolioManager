@@ -1,8 +1,11 @@
 package com.restapi.restapi.dto;
 
+import com.restapi.restapi.model.Quote;
+import lombok.AllArgsConstructor;
 import lombok.Data;
 
 @Data
+@AllArgsConstructor
 public class QuoteDTO {
     private String symbol; // stock
     private double currentPrice; // current price
@@ -13,15 +16,14 @@ public class QuoteDTO {
     private double openPriceOfDay; // open
     private double prevClosePrice; // previous close
 
-    public QuoteDTO(String symbol, double currentPrice, double changes, double percentChange, double highPriceOfDay,
-                    double lowPriceOfDay, double openPriceOfDay, double prevClosePrice) {
-        this.symbol = symbol;
-        this.currentPrice = currentPrice;
-        this.changes = changes;
-        this.percentChange = percentChange;
-        this.highPriceOfDay = highPriceOfDay;
-        this.lowPriceOfDay = lowPriceOfDay;
-        this.openPriceOfDay = openPriceOfDay;
-        this.prevClosePrice = prevClosePrice;
+    public QuoteDTO(Quote quote) {
+        this.symbol = quote.getSymbol();
+        this.currentPrice = quote.getCurrentPrice();
+        this.changes = quote.getChanges();
+        this.percentChange = quote.getPercentChange();
+        this.highPriceOfDay = quote.getHighPriceOfDay();
+        this.lowPriceOfDay = quote.getLowPriceOfDay();
+        this.openPriceOfDay = quote.getOpenPriceOfDay();
+        this.prevClosePrice = quote.getPrevClosePrice();
     }
 }

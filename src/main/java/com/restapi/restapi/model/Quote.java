@@ -15,5 +15,4 @@ public class Quote {
     private double openPriceOfDay;
     private double prevClosePrice;
     public Date creationDate;
-    public Date modificationDate;
 }
