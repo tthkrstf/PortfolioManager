@@ -8,38 +8,22 @@ import { AllCommunityModule, ModuleRegistry} from 'ag-grid-community';
 ModuleRegistry.registerModules([AllCommunityModule]);
 import {AgGridReact} from 'ag-grid-react';
 import {AssetTable} from './AssetTable.jsx';
-//import {Link} from "react-router";
 
 
-function FrontPage() {
+function FrontPage(props) {
 
     const [tableOpen, setTableOpen] = useState(false);
     const [selectedAsset, setSelectedAsset] = useState({});
-    const [rowData, setRowData] = useState([]);
+    const [rowData, setRowData] = useState([props.rowData]);
+    const companyDummyData = props.data;
 
-    const colDefs = [
-        {headerName: "Company", field : "company"},
-        {headerName: "Quote", field : "quote"},
-        {headerName: "News", field : "news"},
-        ]
-    const companyDummyData = {
-        Apple: [{
-            company: "Apple",
-            quote: 90,
-            news: "hello apple"
-            }],
-        Microsoft: [{
-                    company: "Microsoft",
-                    quote: 83,
-                    news: "hello microsoft"
-                    }],
-        };
 
     const handleAssetClick = (company) => {
         console.log("Clicked company: ", company);
         const data = companyDummyData[company];
         setSelectedAsset(data[0]);
         setRowData(data);
+        console.log(rowData);
         setTableOpen(true);
         };
 
@@ -60,7 +44,7 @@ function FrontPage() {
         onAddAssetClick={onAddAssetClick} />
     <Box width="70%" p={2}>
         <div className="ag-theme-alpine" style={{width:"50rem", height: "30rem"}} >
-        <AgGridReact rowData={rowData} columnDefs={colDefs} defaultColDef={{flex : 1, minWidth : 100, resizable: true}} />
+        <AgGridReact rowData={rowData} columnDefs={props.colDefs} defaultColDef={{flex : 1, minWidth : 100, resizable: true}} />
         </div>
 
     </Box>
