@@ -9,24 +9,53 @@ import {FrontPage} from './FrontPage.jsx';
 import ReactDOM from "react-dom/client";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import {Layout} from './Layout';
-//import {AddAsset} from './AddAsset'
+import {AddAsset} from './AddAsset';
 
 function getSymbolInfo( setData){
   fetch("http://localhost:8080/quotes").then((res) => res.json().then((data) =>{setData(data);
-    
+
   }).catch((err) => console.error(err)));
 }
 function App() {
   const [data, setData] = useState([]);
-  
-    
-    
+
+
+
     useEffect( () => getSymbolInfo( setData), []);
     
    
     let displayData;
-    
-    
+
+    const [rowData, setRowData] = useState([]);
+    const colDefs = [
+            {headerName: "Company", field : "company"},
+            {headerName: "Quote", field : "quote"},
+            {headerName: "News", field : "news"},
+            ]
+    const companyDummyData = {
+        Apple: [{
+            company: "Apple",
+            quote: 90,
+            news: "hello apple"
+            }],
+        Microsoft: [{
+                    company: "Microsoft",
+                    quote: 83,
+                    news: "hello microsoft"
+                    }],
+        };
+//
+//     if(data){
+//
+//         let jsonString = JSON.stringify(data,null,2);
+//         obj = JSON.parse(jsonString);
+//         displayData = `${obj.symbol} \n ${obj.currentPrice} \n ${obj.changes} \n ${obj.percentChange} \n ${obj.highPriceOfDay} \n ${obj.openPriceOfDay} \n ${obj.percentChange} \n ${obj.prevClosePrice} `
+//     }
+//     else{
+//         displayData = "No data yet. Cocaine maybe?";
+//     }
+
+
     let dataArray = [];
 
     if(data){
@@ -38,23 +67,22 @@ function App() {
          console.log(data)
          obj = JSON.parse(jsonString);
          displayData = {id:0, value: obj.highPriceOfDay, label: obj.symbol, value2:obj.lowPriceOfDay};*/
-         
-        
-         
+
+
+
     }
     else{
        displayData = "No data yet. Cocaine maybe?";
    }
-   
+
   
     return (
         <BrowserRouter>
               <Routes>
                 <Route path="/" element={<Layout />}>
-                  <Route index element={<Charts mockData={dataArray} />} />
-                  <Route path="assettable" element={<FrontPage/>} />
-                  <Route path="frontPage" element={<FrontPage/>}>
-                  </Route>
+                  <Route index element={<Charts mockData={mockData} />} />
+                  <Route path="assettable" element={<FrontPage data={companyDummyData} rowData={rowData} colDefs={colDefs} />} />
+                  <Route path="addasset" element={<AddAsset data={companyDummyData} rowData={rowData} colDefs={colDefs}/>} />
                 </Route>
               </Routes>
             </BrowserRouter>

@@ -11,6 +11,9 @@ const Layout = () => {
           <li>
             <Link to="/assettable">Asset Table</Link>
           </li>
+          <li>
+          <Link to="/addasset">Add Asset</Link>
+          </li>
         </ul>
       </nav>
        <div>
