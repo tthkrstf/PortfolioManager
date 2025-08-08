@@ -4,15 +4,12 @@ import viteLogo from '/vite.svg';
 import './App.css';
 import {getLastPriceUpdates} from './LastPriceUpdates.jsx';
 import Button from '@mui/material/Button';
-import {pieArcLabelClasses, PieChart} from '@mui/x-charts/PieChart';
-import { BarChart } from '@mui/x-charts/BarChart';
-import'./barChartStyle.css'
-/*import {AgGridReact} from 'ag-grid-react'
-import {AllCommunityModule, ModuleRegistry} from 'ag-grid-community'*/
-//ModuleRegistry.registerModules([AllCommunityModule]);
+import {Charts} from './Charts.jsx';
+import {FrontPage} from './FrontPage.jsx';
+
 
 function App() {
-    const [data, setData] = useState(null);
+//     const [data, setData] = useState(null);
     const [pie, showPie] = useState(null);
     //Click event for getting the data
     const handleClick = () => {
@@ -35,50 +32,25 @@ function App() {
     const mead = {id:3, value: 75, label: "Mead"}
     const mockData = [bier, meth, whiskey, mead];
     
-    
-    if(data){
-        
-        let jsonString = JSON.stringify(data,null,2);
-        obj = JSON.parse(jsonString);
-        displayData = `${obj.symbol} \n ${obj.currentPrice} \n ${obj.changes} \n ${obj.percentChange} \n ${obj.highPriceOfDay} \n ${obj.openPriceOfDay} \n ${obj.percentChange} \n ${obj.prevClosePrice} `
-    }
-    else{
-        displayData = "No data yet. Cocaine maybe?";
-    }
+//
+//     if(data){
+//
+//         let jsonString = JSON.stringify(data,null,2);
+//         obj = JSON.parse(jsonString);
+//         displayData = `${obj.symbol} \n ${obj.currentPrice} \n ${obj.changes} \n ${obj.percentChange} \n ${obj.highPriceOfDay} \n ${obj.openPriceOfDay} \n ${obj.percentChange} \n ${obj.prevClosePrice} `
+//     }
+//     else{
+//         displayData = "No data yet. Cocaine maybe?";
+//     }
    
   
     return (
-      <div class="site-container">
-      <div class="pie-container">
-        {/*<Button variant="outlined" onClick={handleClick}>Click this if you want to snort cocaine</Button> */}
-        <p class="title-style">Current stock holdings</p>
-         <PieChart series={[{data:mockData}]} width={200} height={200} sx={{
-          [`& .${pieArcLabelClasses.root}`]:{filter:'drop-shadow(1px 1px 2px black', animationName: 'animate-pie-arc-label', animationTimingFunction: 'linear', animationIterationCount: 'infinite', 
-            animationDirection: 'alternate'}, [`& .${pieArcLabelClasses.root}.${pieArcLabelClasses.animate}`]: {animationDuration: '5s'}
+        <Charts mockData={mockData} ></Charts>
+        <FrontPage/>
 
-         }} slotProps={{legend: {direction: 'horizontal', position:{vertical: 'bottom', horizontal: 'center'} }}} />
-          
-       {/*<pre>{displayData}</pre>*/ } 
-        
-      </div>
-      
-      <div class="bar-container">
-      <p class="title-style">Quotes</p>
-      <BarChart
-          yAxis={[{ scaleType: 'band', data: ['Bier', 'Vodka B', 'Whiskey'] }]}
-          series={[{ data: [4, 3, 5] }, { data: [1, 6, 3] }, { data: [2, 5, 6] }]}
-          height={300}
-          width={700}
-          layout="horizontal"
-          grid={{vertical: true}}
-          borderRadius={5}
-          
-          
-/>
-         </div>
-      </div>
     );
-  
+}
+
 
 
 
@@ -117,6 +89,7 @@ function App() {
        return event.data;*/
 
 
-}
+
+
 
 export default App
