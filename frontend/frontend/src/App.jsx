@@ -4,81 +4,63 @@ import viteLogo from '/vite.svg';
 import './App.css';
 import {getLastPriceUpdates} from './LastPriceUpdates.jsx';
 import Button from '@mui/material/Button';
-import {pieArcLabelClasses, PieChart} from '@mui/x-charts/PieChart';
-import { BarChart } from '@mui/x-charts/BarChart';
-import'./barChartStyle.css'
-/*import {AgGridReact} from 'ag-grid-react'
-import {AllCommunityModule, ModuleRegistry} from 'ag-grid-community'*/
-//ModuleRegistry.registerModules([AllCommunityModule]);
+import {Charts} from './Charts.jsx';
+import {FrontPage} from './FrontPage.jsx';
+import ReactDOM from "react-dom/client";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
+import {Layout} from './Layout';
+//import {AddAsset} from './AddAsset'
 
+function getSymbolInfo( setData){
+  fetch("http://localhost:8080/quotes").then((res) => res.json().then((data) =>{setData(data);
+    
+  }).catch((err) => console.error(err)));
+}
 function App() {
-    const [data, setData] = useState(null);
-    const [pie, showPie] = useState(null);
-    //Click event for getting the data
-    const handleClick = () => {
-      fetch("http://localhost:8080/quote_example/AAPL")
-        .then((res) => res.json())
-        .then((data) => {
-          setData(data); 
-          console.log(data); 
-        })
-        .catch((err) => console.error(err));
-    };
+  const [data, setData] = useState([]);
+  
+    
+    
+    useEffect( () => getSymbolInfo( setData), []);
     
    
     let displayData;
-    let obj;
-    //Checking if we have the date
-    const bier = {id:0, value: 100, label: "Beer"};
-    const meth = {id:1,value: 50, label:"Vodka "};
-    const whiskey = {id:2,value: 25 ,label: "Whiskey"};
-    const mead = {id:3, value: 75, label: "Mead"}
-    const mockData = [bier, meth, whiskey, mead];
     
     
+    let dataArray = [];
+
     if(data){
+        for(let i = 0; i < data.length; i++){
+          const quoteObj = {id: i, value: data[i].highPriceOfDay +2, value2: data[i].lowPriceOfDay +4, label: data[i].symbol}
+          dataArray.push(quoteObj);
+        }
+         /*let jsonString = JSON.stringify(data,null,2);
+         console.log(data)
+         obj = JSON.parse(jsonString);
+         displayData = {id:0, value: obj.highPriceOfDay, label: obj.symbol, value2:obj.lowPriceOfDay};*/
+         
         
-        let jsonString = JSON.stringify(data,null,2);
-        obj = JSON.parse(jsonString);
-        displayData = `${obj.symbol} \n ${obj.currentPrice} \n ${obj.changes} \n ${obj.percentChange} \n ${obj.highPriceOfDay} \n ${obj.openPriceOfDay} \n ${obj.percentChange} \n ${obj.prevClosePrice} `
+         
     }
     else{
-        displayData = "No data yet. Cocaine maybe?";
-    }
+       displayData = "No data yet. Cocaine maybe?";
+   }
    
   
     return (
-      <div class="site-container">
-      <div class="pie-container">
-        {/*<Button variant="outlined" onClick={handleClick}>Click this if you want to snort cocaine</Button> */}
-        <p class="title-style">Current stock holdings</p>
-         <PieChart series={[{data:mockData}]} width={200} height={200} sx={{
-          [`& .${pieArcLabelClasses.root}`]:{filter:'drop-shadow(1px 1px 2px black', animationName: 'animate-pie-arc-label', animationTimingFunction: 'linear', animationIterationCount: 'infinite', 
-            animationDirection: 'alternate'}, [`& .${pieArcLabelClasses.root}.${pieArcLabelClasses.animate}`]: {animationDuration: '5s'}
-
-         }} slotProps={{legend: {direction: 'horizontal', position:{vertical: 'bottom', horizontal: 'center'} }}} />
-          
-       {/*<pre>{displayData}</pre>*/ } 
-        
-      </div>
-      
-      <div class="bar-container">
-      <p class="title-style">Quotes</p>
-      <BarChart
-          yAxis={[{ scaleType: 'band', data: ['Bier', 'Vodka B', 'Whiskey'] }]}
-          series={[{ data: [4, 3, 5] }, { data: [1, 6, 3] }, { data: [2, 5, 6] }]}
-          height={300}
-          width={700}
-          layout="horizontal"
-          grid={{vertical: true}}
-          borderRadius={5}
-          
-          
-/>
-         </div>
-      </div>
+        <BrowserRouter>
+              <Routes>
+                <Route path="/" element={<Layout />}>
+                  <Route index element={<Charts mockData={dataArray} />} />
+                  <Route path="assettable" element={<FrontPage/>} />
+                  <Route path="frontPage" element={<FrontPage/>}>
+                  </Route>
+                </Route>
+              </Routes>
+            </BrowserRouter>
     );
-  
+}
+
 
 
 
@@ -117,6 +99,7 @@ function App() {
        return event.data;*/
 
 
-}
+
+
 
 export default App
