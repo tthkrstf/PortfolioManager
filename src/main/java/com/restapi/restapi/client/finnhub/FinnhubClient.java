@@ -19,6 +19,8 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 
+import static com.restapi.restapi.common.ApiConstants.COMPANY_NEWS_FROM_DATE;
+
 @Component
 public class FinnhubClient implements FinanceDataProvider {
 
@@ -69,10 +71,11 @@ public class FinnhubClient implements FinanceDataProvider {
     @Override
     public List<FinnhubCompanyNewsRaw> getCompanyNewsRaw(String symbol){
         LocalDate today = LocalDate.now();
+        LocalDate daysBefore = today.minusDays(COMPANY_NEWS_FROM_DATE);
 
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
-        String fromDate = today.format(formatter);
+        String fromDate = daysBefore.format(formatter);
         String toDate = today.format(formatter);
 
 

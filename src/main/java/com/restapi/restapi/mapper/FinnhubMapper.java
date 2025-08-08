@@ -9,6 +9,8 @@ import com.restapi.restapi.dto.external.finnhub.FinnhubQuoteRaw;
 import com.restapi.restapi.dto.QuoteDTO;
 import com.restapi.restapi.dto.external.QuoteRaw;
 import com.restapi.restapi.dto.external.finnhub.FinnhubStockRaw;
+import com.restapi.restapi.model.CompanyNews;
+import com.restapi.restapi.model.Quote;
 import org.springframework.stereotype.Component;
 
 import java.time.Instant;
@@ -27,6 +29,22 @@ public class FinnhubMapper {
         FinnhubQuoteRaw finnHubRaw = (FinnhubQuoteRaw) raw;
         return new QuoteDTO(symbol, finnHubRaw.getC(), finnHubRaw.getD(), finnHubRaw.getDp(),
                 finnHubRaw.getH(), finnHubRaw.getL(), finnHubRaw.getO(), finnHubRaw.getPc());
+    }
+    public List<QuoteDTO> mapQuote(List<Quote> quotes) {
+        return quotes.stream()
+                .map(quote -> {
+                    return new QuoteDTO(
+                            quote.getSymbol(),
+                            quote.getCurrentPrice(),
+                            quote.getChanges(),
+                            quote.getPercentChange(),
+                            quote.getHighPriceOfDay(),
+                            quote.getLowPriceOfDay(),
+                            quote.getOpenPriceOfDay(),
+                            quote.getPrevClosePrice()
+                    );
+                })
+                .collect(Collectors.toList());
     }
 
     public List<CompanyNewsDTO> mapNews(List<? extends CompanyNewsRaw> companyNewsRaws, String symbol) {
@@ -50,6 +68,26 @@ public class FinnhubMapper {
                             finnRaw.getUrl()
                     );
                 })
+                .collect(Collectors.toList());
+    }
+
+    public List<CompanyNewsDTO> mapNews(List<? extends CompanyNews> companyNews) {
+        if (companyNews.isEmpty()) {
+            throw new IllegalArgumentException("Empty Company News provided!");
+        }
+
+        return companyNews.stream()
+                .map(raw -> new CompanyNewsDTO(
+                        raw.getId(),
+                        raw.getCategory(),
+                        new Date(raw.getDatetime().getTime()),
+                        raw.getHeadline(),
+                        raw.getImage(),
+                        raw.getRelated(),
+                        raw.getSource(),
+                        raw.getSummary(),
+                        raw.getUrl()
+                ))
                 .collect(Collectors.toList());
     }
 

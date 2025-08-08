@@ -6,4 +6,5 @@ public class ApiConstants {
     public static final String FINNHUB_COMPANY_NEWS_PATH = "api/v1/company-news";
     public static final String FINNHUB_STOCK_PATH = "api/v1/stock/symbol";
     public static final String EXCHANGE_MARKET = "US";
+    public static final int COMPANY_NEWS_FROM_DATE = 1;
 }

@@ -1,8 +1,11 @@
 package com.restapi.restapi.dto;
 
+import com.restapi.restapi.model.Stock;
+import lombok.AllArgsConstructor;
 import lombok.Data;
 
 @Data
+@AllArgsConstructor
 public class StockDTO {
     private String figi; // FIGI identifier.
     private String symbol; // Display symbol name.
@@ -12,13 +15,13 @@ public class StockDTO {
     private String currency; // Price's currency.
     private String type; // Security type.
 
-    public StockDTO(String figi, String symbol, String displaySymbol, String description, String mic, String currency, String type) {
-        this.figi = figi;
-        this.symbol = symbol;
-        this.displaySymbol = displaySymbol;
-        this.description = description;
-        this.mic = mic;
-        this.currency = currency;
-        this.type = type;
+    public StockDTO(Stock stock) {
+        this.figi = stock.getFigi();
+        this.symbol = stock.getSymbol();
+        this.displaySymbol = stock.getDisplaySymbol();
+        this.description = stock.getDescription();
+        this.mic = stock.getMic();
+        this.currency = stock.getCurrency();
+        this.type = stock.getType();
     }
 }
