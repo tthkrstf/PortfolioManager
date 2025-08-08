@@ -241,9 +241,9 @@ public class FinanceDataService {
         double currentPrice = quote.getCurrentPrice();
         double shares = portfolioDTO.getShares();
 
-        String sql = "INSERT INTO portfolio values(null, ?, ?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO portfolio values(null, ?, ?, ?, CURDATE(), ?, ?)";
         int rows = jdbcTemplate.update(sql, portfolioDTO.getSymbol(), currentPrice,
-                shares, portfolioDTO.getPurchaseDate(), stockDTO.getCurrency(), Transaction.BUY.toString()
+                shares, stockDTO.getCurrency(), Transaction.BUY.toString()
         );
         return rows == 1;
     }
