@@ -11,28 +11,42 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import {Layout} from './Layout';
 import {AddAsset} from './AddAsset';
 
-function getSymbolInfo( setData){
+function getSymbolInfo(setData) {
   const today = new Date();
   const year = today.getFullYear();
   const month = String(today.getMonth()+1).padStart(2,'0');
   const day = String(today.getDate()).padStart(2,'0');
-
   const formattedDate = `${year}-${month}-${day}`;
-  fetch(`http://localhost:8080/quotes?date=2025-08-08`).then((res) => res.json().then((data) =>{setData(data);
-
-  }).catch((err) => console.error(err)));
+  return fetch(`http://localhost:8080/quotes?date=${formattedDate}`)
+    .then(res => res.json())
+    .then(data => setData(data))
+    .catch(err => console.error(err));
 }
-function getPortfolioInfo(setPortfolioData){
-  fetch("http://localhost:8080/portfolio").then((res) => res.json().then((portfolioData) =>{setPortfolioData(portfolioData)}).catch((err) => console.error(err)));
+
+function getPortfolioInfo(setPortfolioData) {
+  return fetch("http://localhost:8080/portfolio")
+    .then(res => res.json())
+    .then(portfolioData => setPortfolioData(portfolioData))
+    .catch(err => console.error(err));
+}
+
+function setUpdateQuotes() {
+  return fetch("http://localhost:8080/quote", { method: "PUT" })
+    .catch(err => console.error("Request failed:", err));
 }
 
 function App() {
-  const [data, setData] = useState([]);
-  const [portfolioData, setPortfolioData] = useState([]);
+    const [data, setData] = useState([]);
+    const [portfolioData, setPortfolioData] = useState([]);
 
 
-    useEffect( () => getSymbolInfo( setData), []);
-    useEffect(() => getPortfolioInfo(setPortfolioData),[] );
+    useEffect(() => {
+      (async () => {
+        await getSymbolInfo(setData);
+        await getPortfolioInfo(setPortfolioData);
+        await setUpdateQuotes();
+      })();
+    }, []);
     
     let displayData;
       
@@ -41,19 +55,30 @@ function App() {
             {headerName: "Company", field : "company"},
             {headerName: "Quote", field : "quote"},
             {headerName: "News", field : "news"},
+            {headerName: "Symbol", field : "symbol"},
             ];
-    
+
+
+
     const companyDummyData = {
         Apple: [{
             company: "Apple",
             quote: 90,
-            news: "hello apple"
+            news: "hello apple",
+            symbol: "AAPL"
             }],
         Microsoft: [{
-                    company: "Microsoft",
-                    quote: 83,
-                    news: "hello microsoft"
-                    }],
+            company: "Microsoft",
+            quote: 83,
+            news: "hello microsoft",
+            symbol: "MSFT"
+            }],
+        Volkswagen: [{
+            company: "Volkswagen",
+            quote: 83,
+            news: "hello volkswagen",
+            symbol: "TVE"
+            }],
         };
 
 
@@ -66,7 +91,7 @@ function App() {
           dataArray.push(quoteObj);
         }
         
-        
+
 
 
 
@@ -76,8 +101,7 @@ function App() {
    }
    if (portfolioData){
       for(let i = 0; i < portfolioData.length; i++){
-        
-        const portfolioObj = {id: i, value:portfolioData[i].shares+1, label:portfolioData[i].symbol};
+        const portfolioObj = {id: i, value:portfolioData[i].shares, label:portfolioData[i].symbol};
         portfolioDataArray.push(portfolioObj);
       }
    }
@@ -86,11 +110,10 @@ function App() {
    
   
     return (
-        <BrowserRouter >
+        <BrowserRouter>
               <Routes>
                 <Route path="/" element={<Layout />}>
                   <Route index element={<Charts mockData={dataToPass} />} />
-                  
                   <Route path="assettable" element={<FrontPage data={companyDummyData} rowData={rowData} colDefs={colDefs} />} />
                   <Route path="addasset" element={<AddAsset data={companyDummyData} rowData={rowData} colDefs={colDefs}/>} />
                 </Route>

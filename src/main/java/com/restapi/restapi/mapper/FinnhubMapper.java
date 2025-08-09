@@ -11,6 +11,7 @@ import com.restapi.restapi.dto.external.QuoteRaw;
 import com.restapi.restapi.dto.external.finnhub.FinnhubStockRaw;
 import com.restapi.restapi.model.CompanyNews;
 import com.restapi.restapi.model.Quote;
+import com.restapi.restapi.model.Stock;
 import org.springframework.stereotype.Component;
 
 import java.time.Instant;
@@ -108,6 +109,26 @@ public class FinnhubMapper {
                             finnRaw.getMic(),
                             finnRaw.getCurrency(),
                             finnRaw.getType()
+                    );
+                })
+                .collect(Collectors.toList());
+    }
+
+    public List<StockDTO> mapStocksFromStock(List<Stock> stocks) {
+        if (stocks.isEmpty()) {
+            throw new IllegalArgumentException("Got empty stock list!");
+        }
+
+        return stocks.stream()
+                .map(stock -> {
+                    return new StockDTO(
+                            stock.getFigi(),
+                            stock.getSymbol(),
+                            stock.getDisplaySymbol(),
+                            stock.getDescription(),
+                            stock.getMic(),
+                            stock.getCurrency(),
+                            stock.getType()
                     );
                 })
                 .collect(Collectors.toList());

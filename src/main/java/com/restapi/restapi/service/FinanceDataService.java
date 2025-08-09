@@ -199,11 +199,36 @@ public class FinanceDataService {
         return Arrays.stream(rows).sum() > 0;
     }
 
-    public List<Stock> getAllStocks() {
+    public List<StockDTO> getAllStocksFromDB() {
+        List<StockDTO> stockDTO = fetchAllStocks();
+        if(stockDTO.isEmpty()){
+            createStock();
+            stockDTO = fetchAllStocks();
+        }
+        return stockDTO.isEmpty() ? null : stockDTO;
+    }
+
+    public List<StockDTO> getAllStocksFromDB(String companyName, int limit) {
+        List<StockDTO> stockDTO = fetchAllStocks(companyName, limit);
+        if(stockDTO.isEmpty()){
+            createStock();
+            stockDTO = fetchAllStocks(companyName, limit);
+        }
+        return stockDTO.isEmpty() ? null : stockDTO;
+    }
+
+    @Transactional
+    public List<StockDTO> fetchAllStocks() {
         List<Stock> stocks = jdbcTemplate.query("select * from stock",
                 new Object[]{}, new BeanPropertyRowMapper<>(Stock.class));
+        return finnhubMapper.mapStocksFromStock(stocks);
+    }
 
-        return stocks;
+    @Transactional
+    public List<StockDTO> fetchAllStocks(String companyName, int limit) {
+        List<Stock> stocks = jdbcTemplate.query("select * from stock where lower(description) like lower(?) limit ?",
+                new Object[]{"%" + companyName + "%", limit}, new BeanPropertyRowMapper<>(Stock.class));
+        return finnhubMapper.mapStocksFromStock(stocks);
     }
 
     public List<CompanyNews> getAllCompanyNews() {
@@ -252,6 +277,20 @@ public class FinanceDataService {
         String sql = "select symbol, sum(case when type = 'BUY' then shares when type = 'SELL' then -shares else 0 end) as shares from portfolio group by symbol";
         List<SharesDTO> shares = jdbcTemplate.query(sql, new Object[]{}, new BeanPropertyRowMapper<>(SharesDTO.class));
         return shares.isEmpty() ? null : shares;
+    }
+
+    public List<String> getAllSymbolsFromPortfolio() {
+        String sql = "select distinct symbol from portfolio";
+        List<String> symbols = jdbcTemplate.queryForList(sql, String.class);
+        return symbols.isEmpty() ? null : symbols;
+    }
+
+    public boolean updateQuotesForExistingStocks() {
+        List<String> symbols = getAllSymbolsFromPortfolio();
+        for(String symbol : symbols){
+            createQuote(symbol);
+        }
+        return true;
     }
 
     public Double getAmountForSymbol(String symbol) {
