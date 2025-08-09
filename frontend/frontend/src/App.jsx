@@ -12,7 +12,13 @@ import {Layout} from './Layout';
 import {AddAsset} from './AddAsset';
 
 function getSymbolInfo( setData){
-  fetch("http://localhost:8080/quotes?date=2025-08-08").then((res) => res.json().then((data) =>{setData(data);
+  const today = new Date();
+  const year = today.getFullYear();
+  const month = String(today.getMonth()+1).padStart(2,'0');
+  const day = String(today.getDate()).padStart(2,'0');
+
+  const formattedDate = `${year}-${month}-${day}`;
+  fetch(`http://localhost:8080/quotes?date=2025-08-08`).then((res) => res.json().then((data) =>{setData(data);
 
   }).catch((err) => console.error(err)));
 }
@@ -49,30 +55,18 @@ function App() {
                     news: "hello microsoft"
                     }],
         };
-//
-//     if(data){
-//
-//         let jsonString = JSON.stringify(data,null,2);
-//         obj = JSON.parse(jsonString);
-//         displayData = `${obj.symbol} \n ${obj.currentPrice} \n ${obj.changes} \n ${obj.percentChange} \n ${obj.highPriceOfDay} \n ${obj.openPriceOfDay} \n ${obj.percentChange} \n ${obj.prevClosePrice} `
-//     }
-//     else{
-//         displayData = "No data yet. Cocaine maybe?";
-//     }
 
 
     const dataArray = [];
     const portfolioDataArray = [];
     if(data){
         for(let i = 0; i < data.length; i++){
-          const quoteObj = {id: i, value: data[i].highPriceOfDay, value2: data[i].lowPriceOfDay, label: data[i].symbol}
+          console.log(data[i].currentPrice);
+          const quoteObj = {id: i, value: data[i].highPriceOfDay, value2: data[i].lowPriceOfDay, segg: data[i].currentPrice, label: data[i].symbol }
           dataArray.push(quoteObj);
         }
         
-         /*let jsonString = JSON.stringify(data,null,2);
-         console.log(data)
-         obj = JSON.parse(jsonString);
-         displayData = {id:0, value: obj.highPriceOfDay, label: obj.symbol, value2:obj.lowPriceOfDay};*/
+        
 
 
 
@@ -82,6 +76,7 @@ function App() {
    }
    if (portfolioData){
       for(let i = 0; i < portfolioData.length; i++){
+        
         const portfolioObj = {id: i, value:portfolioData[i].shares+1, label:portfolioData[i].symbol};
         portfolioDataArray.push(portfolioObj);
       }
@@ -91,10 +86,11 @@ function App() {
    
   
     return (
-        <BrowserRouter>
+        <BrowserRouter >
               <Routes>
                 <Route path="/" element={<Layout />}>
                   <Route index element={<Charts mockData={dataToPass} />} />
+                  
                   <Route path="assettable" element={<FrontPage data={companyDummyData} rowData={rowData} colDefs={colDefs} />} />
                   <Route path="addasset" element={<AddAsset data={companyDummyData} rowData={rowData} colDefs={colDefs}/>} />
                 </Route>
