@@ -1,9 +1,6 @@
 package com.restapi.restapi.controller;
 
-import com.restapi.restapi.dto.CompanyNewsDTO;
-import com.restapi.restapi.dto.PortfolioDTO;
-import com.restapi.restapi.dto.QuoteDTO;
-import com.restapi.restapi.dto.SharesDTO;
+import com.restapi.restapi.dto.*;
 import com.restapi.restapi.model.Portfolio;
 import com.restapi.restapi.model.Stock;
 import com.restapi.restapi.service.FinanceDataService;
@@ -78,6 +75,21 @@ public class FinanceDataController {
                 ResponseEntity.badRequest().body("Inserted failed!");
     }
 
+    // FROM DB
+    @GetMapping("/stock")
+    public ResponseEntity<List<StockDTO>> getStock(){
+        List<StockDTO> stockDTO = finService.getAllStocksFromDB();
+
+        return stockDTO.isEmpty() ? ResponseEntity.badRequest().build() : ResponseEntity.ok(stockDTO);
+    }
+
+    @GetMapping("/stock/companyName")
+    public ResponseEntity<List<StockDTO>> getStockBySymbol(@RequestParam String companyName, @RequestParam int limit){
+        List<StockDTO> stockDTO = finService.getAllStocksFromDB(companyName, limit);
+
+        return stockDTO.isEmpty() ? ResponseEntity.badRequest().build() : ResponseEntity.ok(stockDTO);
+    }
+
     // TO DB
     @PostMapping("/portfolio")
     public ResponseEntity<String> postPortfolio(@RequestBody PortfolioDTO portfolioDTO){
@@ -102,5 +114,14 @@ public class FinanceDataController {
 
         return success ? ResponseEntity.ok("Successfully sold!") :
                 ResponseEntity.status(HttpStatus.NOT_FOUND).body("Stock either not in the portfolio, or you tried to sell more than you have!");
+    }
+
+    // FROM DB
+    @PutMapping("/quote")
+    public ResponseEntity<String> getSymbolsFromPortfolio(){
+        boolean success = finService.updateQuotesForExistingStocks();
+
+        return success ? ResponseEntity.ok("Success!") :
+                ResponseEntity.status(HttpStatus.NOT_FOUND).body("Couldn't update one or more stocks current price!");
     }
 }
