@@ -9,8 +9,8 @@ import {AgGridReact} from 'ag-grid-react';
 import ToggleButton from '@mui/material/ToggleButton';
 import ToggleButtonGroup from '@mui/material/ToggleButtonGroup';
 
-
 function AddAsset(props) {
+    
     const handleChangeCompany = (event) => {
             setSelectedAssetCompany(event.target.value);
             setSelectedCompanyData(props.data[event.target.value]);

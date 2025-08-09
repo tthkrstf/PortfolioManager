@@ -17,7 +17,7 @@ const Item = styled(Paper)(({ theme }) => ({
 }));
 
 function AssetTable(props) {
-
+    console.log(props);
     const onAddAssetClick = () => {
             
 
