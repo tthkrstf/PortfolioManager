@@ -72,6 +72,7 @@ function App() {
             {headerName: "Net Worth", field : "netWorth"},
             ];
 
+    
     return (
         <BrowserRouter>
               <Routes>
