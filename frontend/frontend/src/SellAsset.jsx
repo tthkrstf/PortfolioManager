@@ -211,7 +211,19 @@ function SellAsset(props) {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(payload)
     })
-    .catch(err => console.error("Request failed:", err));
+    .then(response => {
+      if (!response.ok) {
+        throw new Error(`Server error: ${response.status}`);
+      }
+      return response.text();
+    })
+    .then(() => {
+      alert("Asset sold successfully!");
+    })
+    .catch(err => {
+      console.error("Request failed:", err);
+      alert(`Failed to sell asset: ${err.message}`);
+    });
   };
 
   // Autocomplete is for the search/dropdown list.
