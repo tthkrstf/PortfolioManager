@@ -135,7 +135,9 @@ function Charts(props) {
           <div class="pie-container">
             {/*<Button variant="outlined" onClick={handleClick}>Click this if you want to snort cocaine</Button> */}
             <p class="title-style">Current stock holdings</p>
-             <PieChart colors={colorArray} series={[{data:dataToPass.portfolioData, innerRadius:50, outerRadius:100, }]}  width={250} height={250} sx={{ '& .MuiPieArc-root': {stroke: 'none'},
+            <p class="additional-label">{`Net Worth: ${props.mockData.netPaidData[0].value}`}</p>
+            <p class="additional-label">{`Amount Paid: ${props.mockData.netPaidData[1].value}`}</p>
+             <PieChart colors={colorArray} series={[{data:props.mockData.portfolioData, innerRadius:50, outerRadius:100, }]}  width={250} height={250} sx={{ '& .MuiPieArc-root': {stroke: 'none'},
               [`& .${pieArcLabelClasses.root}`]:{filter:'drop-shadow(1px 1px 2px black', animationName: 'animate-pie-arc-label', animationTimingFunction: 'linear', animationIterationCount: 'infinite',
                 animationDirection: 'alternate'}, [`& .${pieArcLabelClasses.root}.${pieArcLabelClasses.animate}`]: {animationDuration: '5s'}
 
@@ -146,9 +148,11 @@ function Charts(props) {
 
           </div>
           <div id="two-part-pie" class="pie-container">
+            <br/>
+
             {/*<Button variant="outlined" onClick={handleClick}>Click this if you want to snort cocaine</Button> */}
             <p class="title-style">Current stock values</p>
-             <PieChart colors={colorArray} series={[{data:dataToPass.netPaidData, innerRadius:50, outerRadius:100, }]}  width={250} height={250} sx={{ '& .MuiPieArc-root': {stroke: 'none'},
+             <PieChart colors={colorArray} series={[{data:props.mockData.holdingsData, innerRadius:50, outerRadius:100, }]}  width={250} height={250} sx={{ '& .MuiPieArc-root': {stroke: 'none'},
               [`& .${pieArcLabelClasses.root}`]:{filter:'drop-shadow(1px 1px 2px black', animationName: 'animate-pie-arc-label', animationTimingFunction: 'linear', animationIterationCount: 'infinite',
                 animationDirection: 'alternate'}, [`& .${pieArcLabelClasses.root}.${pieArcLabelClasses.animate}`]: {animationDuration: '5s'}
 
@@ -156,11 +160,12 @@ function Charts(props) {
             
 
            {/*<pre>{displayData}</pre>*/ }
-
+             <br/>
           </div>
 
           <div class="bar-container">
-          <p class="title-style bar-title">Quotes</p>
+
+          <p class="title-style">Daily pricings</p>
           <BarChart
               yAxis={[{ scaleType: 'band', data: getLabels() }]}
               series={series}
@@ -172,12 +177,13 @@ function Charts(props) {
                 '& .MuiPieArc-root': {stroke: 'none'},
               }}
               borderRadius={5}
-              slotProps={{tooltip: {trigger: 'axis'}, axisLine:{style:{stroke:'rgb(212, 200, 200)', strokeWidth:2}}, axisTick:{style:{stroke:'rgb(173, 164, 164)', strokeWidth:2}}}}
+              slotProps={{tooltip: {trigger: 'axis'}, axisTickLabel:{style:{color: 'rgb(255,255,255)'}}, axisLine:{style:{color: 'rgb(255,255,255)', stroke:'rgb(212, 200, 200)', strokeWidth:2}}, axisTick:{style:{stroke:'rgb(173, 164, 164)', strokeWidth:2}}}}
               
 
 
     />
              </div>
+
           </div>
     );
     }

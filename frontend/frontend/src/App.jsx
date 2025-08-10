@@ -72,6 +72,14 @@ function App() {
             {headerName: "Net Worth", field : "netWorth"},
             ];
 
+    if(holdingsData){
+          for (let i = 0; i < holdingsData.length; i++) {
+            const element = {id:i, value: holdingsData[i].totalWorth, label:holdingsData[i].symbol}
+            holdingsDataArray.push(element);
+
+          }
+
+        }
     return (
         <BrowserRouter>
               <Routes>
