@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import reactLogo from './assets/react.svg';
-import viteLogo from '/vite.svg';
-import './App.css';
+import viteLogos from '/vite.svg';
+import './style.css';
 import {getLastPriceUpdates} from './LastPriceUpdates.jsx';
 import Button from '@mui/material/Button';
 import {Charts} from './Charts.jsx';

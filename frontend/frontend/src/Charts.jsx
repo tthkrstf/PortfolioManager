@@ -1,60 +1,60 @@
 import {pieArcLabelClasses, PieChart} from '@mui/x-charts/PieChart';
 import { BarChart } from '@mui/x-charts/BarChart';
-import'./barChartStyle.css'
+import'./style.css'
 function Charts(props) {
   console.log(props.mockData.portfolioData);
   let colorArray = [
-    "rgb(229, 45, 45)",
-    "rgb(229, 67, 45)",
-    "rgb(229, 89, 45)",
-    "rgb(229, 111, 45)",
-    "rgb(229, 134, 45)",
-    "rgb(229, 156, 45)",
-    "rgb(229, 178, 45)",
-    "rgb(229, 200, 45)",
-    "rgb(229, 222, 45)",
-    "rgb(214, 229, 45)",
     "rgb(192, 229, 45)",
-    "rgb(170, 229, 45)",
-    "rgb(148, 229, 45)",
-    "rgb(126, 229, 45)",
-    "rgb(104, 229, 45)",
-    "rgb(82, 229, 45)",
-    "rgb(60, 229, 45)",
-    "rgb(45, 229, 53)",
-    "rgb(45, 229, 75)",
+    "rgb(229, 45, 222)",
     "rgb(45, 229, 97)",
-    "rgb(45, 229, 119)",
-    "rgb(45, 229, 141)",
-    "rgb(45, 229, 163)",
-    "rgb(45, 229, 185)",
+    "rgb(229, 45, 67)",
     "rgb(45, 229, 207)",
-    "rgb(45, 229, 229)",
-    "rgb(45, 207, 229)",
-    "rgb(45, 185, 229)",
-    "rgb(45, 163, 229)",
-    "rgb(45, 141, 229)",
-    "rgb(45, 119, 229)",
-    "rgb(45, 97, 229)",
-    "rgb(45, 75, 229)",
-    "rgb(45, 53, 229)",
-    "rgb(60, 45, 229)",
-    "rgb(82, 45, 229)",
+    "rgb(148, 229, 45)",
+    "rgb(229, 45, 200)",
     "rgb(104, 45, 229)",
-    "rgb(126, 45, 229)",
-    "rgb(148, 45, 229)",
+    "rgb(45, 97, 229)",
+    "rgb(229, 67, 45)",
+    "rgb(45, 53, 229)",
+    "rgb(45, 185, 229)",
+    "rgb(82, 229, 45)",
+    "rgb(229, 156, 45)",
+    "rgb(45, 229, 141)",
     "rgb(170, 45, 229)",
+    "rgb(60, 45, 229)",
     "rgb(192, 45, 229)",
     "rgb(214, 45, 229)",
-    "rgb(229, 45, 222)",
-    "rgb(229, 45, 200)",
-    "rgb(229, 45, 178)",
+    "rgb(170, 229, 45)",
     "rgb(229, 45, 156)",
-    "rgb(229, 45, 134)",
-    "rgb(229, 45, 111)",
+    "rgb(60, 229, 45)",
+    "rgb(45, 75, 229)",
+    "rgb(45, 229, 53)",
+    "rgb(126, 229, 45)",
+    "rgb(229, 45, 45)",
+    "rgb(45, 229, 185)",
+    "rgb(229, 89, 45)",
+    "rgb(45, 141, 229)",
+    "rgb(104, 229, 45)",
+    "rgb(229, 134, 45)",
+    "rgb(229, 200, 45)",
+    "rgb(229, 178, 45)",
+    "rgb(229, 45, 119)",
+    "rgb(82, 45, 229)",
+    "rgb(229, 111, 45)",
+    "rgb(229, 45, 178)",
+    "rgb(214, 229, 45)",
+    "rgb(45, 163, 229)",
+    "rgb(45, 229, 229)",
+    "rgb(45, 207, 229)",
+    "rgb(45, 119, 229)",
+    "rgb(45, 229, 75)",
+    "rgb(148, 45, 229)",
+    "rgb(126, 45, 229)",
     "rgb(229, 45, 89)",
-    "rgb(229, 45, 67)"
-  ]
+    "rgb(229, 45, 134)",
+    "rgb(45, 229, 163)",
+    "rgb(229, 222, 45)",
+    "rgb(229, 45, 111)"
+  ];
   
   function getLabels(){
     let labelArray  = [];
@@ -94,6 +94,20 @@ function Charts(props) {
                 animationDirection: 'alternate'}, [`& .${pieArcLabelClasses.root}.${pieArcLabelClasses.animate}`]: {animationDuration: '5s'}
 
              }} slotProps={{legend: {direction: 'horizontal', position:{vertical: 'bottom', horizontal: 'center'} }}} />
+            
+
+           {/*<pre>{displayData}</pre>*/ }
+
+          </div>
+          <div id="two-part-pie" class="pie-container">
+            {/*<Button variant="outlined" onClick={handleClick}>Click this if you want to snort cocaine</Button> */}
+            <p class="title-style">Current stock holdings</p>
+             <PieChart colors={colorArray} series={[{data:props.mockData.portfolioData, innerRadius:50, outerRadius:100, }]}  width={250} height={250} sx={{ '& .MuiPieArc-root': {stroke: 'none'},
+              [`& .${pieArcLabelClasses.root}`]:{filter:'drop-shadow(1px 1px 2px black', animationName: 'animate-pie-arc-label', animationTimingFunction: 'linear', animationIterationCount: 'infinite',
+                animationDirection: 'alternate'}, [`& .${pieArcLabelClasses.root}.${pieArcLabelClasses.animate}`]: {animationDuration: '5s'}
+
+             }} slotProps={{legend: {direction: 'horizontal', position:{vertical: 'bottom', horizontal: 'center'} }}} />
+            
 
            {/*<pre>{displayData}</pre>*/ }
 
@@ -104,8 +118,8 @@ function Charts(props) {
           <BarChart
               yAxis={[{ scaleType: 'band', data: getLabels() }]}
               series={series}
-              height={300}
-              width={500}
+              height={500}
+              width={700}
               layout="horizontal"
               grid={{vertical: true}}
               sx={{
