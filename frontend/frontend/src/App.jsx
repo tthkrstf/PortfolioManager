@@ -43,19 +43,27 @@ function setUpdateQuotes() {
     .catch(err => console.error("Request failed:", err));
 }
 
+
+function getAdditionalPortfolioInfo(setNetPaid){
+  console.log("asd");
+  return fetch("http://localhost:8080/portfolio/netPaid").then(res => res.json()).then(netPaid => setNetPaid(netPaid)).catch(err => console.error(err));
+
+}
 function App() {
     const [data, setData] = useState([]);
     const [portfolioData, setPortfolioData] = useState([]);
-
-
+  const [netPaid, setNetPaid] = useState([]);
+    
     useEffect(() => {
       (async () => {
         await getSymbolInfo(setData);
         await getPortfolioInfo(setPortfolioData);
         await setUpdateQuotes();
+        await getPortfolioHoldings(setPortfolioData)
+        await getAdditionalPortfolioInfo(setNetPaid);
       })();
     }, []);
-    
+   
     let displayData;
       
     const [rowData, setRowData] = useState([]);
