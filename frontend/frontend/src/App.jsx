@@ -10,6 +10,7 @@ import ReactDOM from "react-dom/client";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import {Layout} from './Layout';
 import {AddAsset} from './AddAsset';
+import {SellAsset} from './SellAsset';
 
 function getSymbolInfo(setData) {
   const today = new Date();
@@ -23,7 +24,7 @@ function getSymbolInfo(setData) {
     .catch(err => console.error(err));
 }
 
-function getPortfolioInfo(setPortfolioData) {
+export function getPortfolioInfo(setPortfolioData) {
   return fetch("http://localhost:8080/portfolio")
     .then(res => res.json())
     .then(portfolioData => setPortfolioData(portfolioData))
@@ -64,6 +65,13 @@ function App() {
             {headerName: "News", field : "news"},
             {headerName: "Symbol", field : "symbol"},
             ];
+    const colDefsForSell = [
+            {headerName: "Company", field : "company"},
+            {headerName: "Current Price", field : "currentPrice"},
+            {headerName: "News", field : "news"},
+            {headerName: "Symbol", field : "symbol"},
+            {headerName: "Shares", field : "shares"},
+            ];
     const colDefsForAssetTable = [
             {headerName: "Company", field : "company"},
             {headerName: "Current Price", field : "currentPrice"},
@@ -100,7 +108,8 @@ function App() {
                 <Route path="/" element={<Layout />}>
                   <Route index element={<Charts mockData={dataToPass} />} />
                   <Route path="assettable" element={<AssetTable colDefs={colDefsForAssetTable} />} />
-                  <Route path="addasset" element={<AddAsset rowData={rowData} colDefs={colDefs}/>} />
+                  <Route path="addasset" element={<AddAsset colDefs={colDefs}/>} />
+                  <Route path="sellasset" element={<SellAsset colDefs={colDefsForSell}/>} />
                 </Route>
               </Routes>
             </BrowserRouter>

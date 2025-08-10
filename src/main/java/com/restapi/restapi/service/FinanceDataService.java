@@ -27,6 +27,7 @@ import java.sql.SQLException;
 import java.time.LocalDate;
 import java.util.*;
 import java.sql.Date;
+import java.util.stream.Collectors;
 
 @Service
 public class FinanceDataService {
@@ -281,13 +282,13 @@ public class FinanceDataService {
     }
 
     public List<SharesDTO> getAllSharesFromPortfolio() {
-        String sql = "select symbol, sum(case when type = 'BUY' then shares when type = 'SELL' then -shares else 0 end) as shares from portfolio group by symbol";
+        String sql = "select symbol, sum(case when type = 'BUY' then shares when type = 'SELL' then -shares else 0 end) as shares from portfolio group by symbol having shares > 0";
         List<SharesDTO> shares = jdbcTemplate.query(sql, new Object[]{}, new BeanPropertyRowMapper<>(SharesDTO.class));
         return shares.isEmpty() ? null : shares;
     }
 
     public List<SharesDTO> getAllSharesFromPortfolioPrices() {
-        String sql = "select symbol, sum(case when type = 'BUY' then shares when type = 'SELL' then -shares else 0 end) as shares from portfolio group by symbol";
+        String sql = "select symbol, sum(case when type = 'BUY' then shares when type = 'SELL' then -shares else 0 end) as shares from portfolio group by symbol having shares > 0";
         List<SharesDTO> shares = jdbcTemplate.query(sql, new Object[]{}, new BeanPropertyRowMapper<>(SharesDTO.class));
         if (shares.isEmpty()) {
             return null;
@@ -415,7 +416,9 @@ public class FinanceDataService {
             );
         }
 
-        return new ArrayList<>(assetMap.values());
+        return assetMap.values().stream()
+                .filter(asset -> asset.getShares() != 0)
+                .collect(Collectors.toList());
     }
 
     public List<String> getAllSymbolsFromPortfolio() {

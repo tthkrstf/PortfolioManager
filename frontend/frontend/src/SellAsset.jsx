@@ -11,7 +11,7 @@ ModuleRegistry.registerModules([AllCommunityModule]);
 import {AgGridReact} from 'ag-grid-react';
 import ToggleButton from '@mui/material/ToggleButton';
 import ToggleButtonGroup from '@mui/material/ToggleButtonGroup';
-import './style.css'
+import {getPortfolioInfo} from './App'
 
 function getStocks(setStocks) {
   return fetch("http://localhost:8080/stock", { method: "GET" })
@@ -61,16 +61,36 @@ const ListboxComponent = forwardRef(function ListboxComponent(props, ref) {
   );
 });
 
-function AddAsset(props) {
+function SellAsset(props) {
   // UseMemo runs first on the empty stocks list
   // Loads the stocks with useState after first render -> useMemo picks up changes ->  runs the mapping
   const [stocks, setStocks] = useState([]);
-  useEffect(() => { (async () => { await getStocks(setStocks); })(); }, []);
+  const [portfolioData, setPortfolioData] = useState([]);
+  useEffect(() => {
+    (async () => {
+      await getStocks(setStocks);
+      await getPortfolioInfo(setPortfolioData);
+    })();
+  }, []);
 
-  const companyNames = useMemo(
-    () => [...new Set(stocks.map(item => item.description))],
-    [stocks]
+  const symbolsAndShares = useMemo(
+    () => Array.isArray(portfolioData)
+        ? [...new Set(portfolioData.map(item => item))]
+        : [],
+  [portfolioData]
   );
+
+  const companyNames = useMemo(() => {
+      const allowedSymbols = new Set(symbolsAndShares.map(s => s.symbol));
+      return [
+        ...new Set(
+          stocks
+            .filter(item => allowedSymbols.has(item.symbol))
+            .map(item => item.description)
+        )
+      ];
+  }, [stocks, symbolsAndShares]);
+
 
   const [selectedAssetCompany, setSelectedAssetCompany] = useState("");
   const [selectedCompanyData, setSelectedCompanyData] = useState({});
@@ -156,12 +176,14 @@ function AddAsset(props) {
       ]);
 
       const firstNews = Array.isArray(news) ? (news[0].summary ?? null) : null;
+      const shares = symbolsAndShares.find(s => s.symbol === symbol).shares;
 
       setSelectedCompanyData({
         company: value,
         symbol: symbol,
         currentPrice: quote?.currentPrice ?? null,
-        news: firstNews
+        news: firstNews,
+        shares: shares
       });
 
     } catch (err) {
@@ -185,7 +207,7 @@ function AddAsset(props) {
     };
 
     fetch("http://localhost:8080/portfolio", {
-      method: "POST",
+      method: "DELETE",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(payload)
     })
@@ -211,13 +233,11 @@ function AddAsset(props) {
   //    renderInput: params here just mean for the styling, so just pass every styling option, value it has etc.
 
   return (
-    <div >
-    <div class="add-table" >
+    <div class="random">
       <h1> Add new asset </h1>
-      <Box 
-        
+      <Box
         component="form"
-        sx={{ '& .MuiTextField-root': { m: 1, width: '50rem' } }}
+        sx={{ '& .MuiTextField-root': { m: 1, width: '55ch' } }}
         noValidate
         autoComplete="off"
       >
@@ -241,7 +261,7 @@ function AddAsset(props) {
           />
 
 
-          <div className="ag-theme-alpine" style={{width:"50rem", height: "20rem"}} >
+          <div className="ag-theme-alpine" style={{width:"30rem", height: "20rem"}} >
             <AgGridReact
               rowData={gridRows}
               columnDefs={props.colDefs}
@@ -255,14 +275,13 @@ function AddAsset(props) {
                 value={inputValue}
                 onChange={handleInput}
               />
-              <Button variant="outlined" onClick={handleClick}>Buy</Button>
+              <Button variant="outlined" onClick={handleClick}>Sell</Button>
             </div>
           </div>
         </div>
       </Box>
     </div>
-    </div>
   );
 }
 
-export { AddAsset }
+export { SellAsset }
