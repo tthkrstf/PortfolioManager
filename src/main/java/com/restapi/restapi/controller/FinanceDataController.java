@@ -142,8 +142,8 @@ public class FinanceDataController {
 
     // FROM DB
     @PutMapping("/quote")
-    public ResponseEntity<String> getSymbolsFromPortfolio(@RequestBody QuoteDTO quoteDTO){
-        boolean success = finService.putQuote(quoteDTO);
+    public ResponseEntity<String> getSymbolsFromPortfolio(){
+        boolean success = finService.updateQuotesForExistingStocks();
 
         return success ? ResponseEntity.ok("Success!") :
                 ResponseEntity.status(HttpStatus.NOT_FOUND).body("Couldn't update one or more stocks current price!");
