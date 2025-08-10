@@ -1,8 +1,6 @@
 package com.restapi.restapi.controller;
 
 import com.restapi.restapi.dto.*;
-import com.restapi.restapi.model.Portfolio;
-import com.restapi.restapi.model.Stock;
 import com.restapi.restapi.service.FinanceDataService;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
@@ -10,7 +8,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
-import java.util.Date;
+import java.util.Collections;
 import java.util.List;
 
 @RestController
@@ -52,7 +50,9 @@ public class FinanceDataController {
     @GetMapping("/company_news/{symbol}")
     public ResponseEntity<List<CompanyNewsDTO>> getCompanyNews(@PathVariable String symbol){
         List<CompanyNewsDTO> companyNewsDTO = finService.getCompanyNewsFromDB(symbol);
-        return companyNewsDTO.isEmpty() ? ResponseEntity.notFound().build() : ResponseEntity.ok(companyNewsDTO);
+        return (companyNewsDTO == null || companyNewsDTO.isEmpty()) ?
+                ResponseEntity.ok(Collections.singletonList(new CompanyNewsDTO())) :
+                ResponseEntity.ok(companyNewsDTO);
     }
 
     // TO DB
@@ -92,8 +92,8 @@ public class FinanceDataController {
 
     // TO DB
     @PostMapping("/portfolio")
-    public ResponseEntity<String> postPortfolio(@RequestBody PortfolioDTO portfolioDTO){
-        boolean success = finService.createPortfolio(portfolioDTO);
+    public ResponseEntity<String> postPortfolio(@RequestBody SharesDTO sharesDTO){
+        boolean success = finService.createPortfolio(sharesDTO);
 
         return success ? ResponseEntity.ok("Successfully inserted stock into the portfolio!") :
                 ResponseEntity.badRequest().body("Inserted failed!");
@@ -101,10 +101,18 @@ public class FinanceDataController {
 
     // FROM DB
     @GetMapping("/portfolio")
-    public ResponseEntity<List<SharesDTO>> getPortfolio(){
-        List<SharesDTO> sharesDTO = finService.getAllFromPortfolio();
+    public ResponseEntity<List<SharesDTO>> getPortfolioShares(){
+        List<SharesDTO> sharesDTO = finService.getAllSharesFromPortfolio();
 
         return sharesDTO.isEmpty() ? ResponseEntity.noContent().build() : ResponseEntity.ok(sharesDTO);
+    }
+
+    // FROM DB
+    @GetMapping("/portfolio/holdings")
+    public ResponseEntity<List<AssetTableDTO>> getPortfolioHoldings(){
+        List<AssetTableDTO> assetTableDTO = finService.getAllFromPortfolio();
+
+        return assetTableDTO.isEmpty() ? ResponseEntity.noContent().build() : ResponseEntity.ok(assetTableDTO);
     }
 
     // FROM DB

@@ -1,38 +1,43 @@
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import Box from '@mui/material/Box';
 import Paper from '@mui/material/Paper';
 import Stack from '@mui/material/Stack';
 import Button from '@mui/material/Button';
 import { styled } from '@mui/material/styles';
+import { AllCommunityModule, ModuleRegistry } from "ag-grid-community";
+ModuleRegistry.registerModules([AllCommunityModule]);
+import { AgGridReact } from "ag-grid-react";
+import { getPortfolioHoldings } from "./App.jsx";
 
-const Item = styled(Paper)(({ theme }) => ({
-  backgroundColor: '#fff',
-  ...theme.typography.body2,
-  padding: theme.spacing(1),
-  textAlign: 'center',
-  color: (theme.vars ?? theme).palette.text.secondary,
-  ...theme.applyStyles('dark', {
-    backgroundColor: '#1A2027',
-  }),
-}));
+function AssetTable({ colDefs }) {
+      const [rows, setRows] = useState([]);
 
-function AssetTable(props) {
-    console.log(props);
-    const onAddAssetClick = () => {
-            
+  useEffect(() => {
+    getPortfolioHoldings((data) => {
+      setRows(data);
+    });
+  }, []);
 
-            console.log("hey");
-        }
-
-    return (
-        <div>
-            <h1> Asset Table </h1>
-            <Button onClick={props.onAddAssetClick}> Add </Button>
-            <Stack> {props.companyNames.map((company) => (
-                <Item key={company} onClick={() => props.handleAssetClick(company)}> {company}</Item>))}
-            </Stack>
-        </div>
-        );
-    }
+  return (
+    <div className="random">
+      <h1>Asset Table</h1>
+      <div
+        className="ag-theme-alpine"
+        style={{ width: "70rem", height: "32rem" }}
+      >
+        <AgGridReact
+          rowData={rows}
+          columnDefs={colDefs}
+          defaultColDef={{
+            minWidth: 80,
+            maxWidth: 155,
+            resizable: true,
+            cellStyle: { padding: "4px" }
+          }}
+        />
+      </div>
+    </div>
+  );
+}
 
 export {AssetTable}
