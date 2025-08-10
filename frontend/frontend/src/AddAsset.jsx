@@ -11,6 +11,7 @@ ModuleRegistry.registerModules([AllCommunityModule]);
 import {AgGridReact} from 'ag-grid-react';
 import ToggleButton from '@mui/material/ToggleButton';
 import ToggleButtonGroup from '@mui/material/ToggleButtonGroup';
+import './style.css'
 
 function getStocks(setStocks) {
   return fetch("http://localhost:8080/stock", { method: "GET" })
@@ -211,11 +212,13 @@ function AddAsset(props) {
   //    renderInput: params here just mean for the styling, so just pass every styling option, value it has etc.
 
   return (
-    <div class="random">
+    <div >
+    <div class="add-table" >
       <h1> Add new asset </h1>
-      <Box
+      <Box 
+        
         component="form"
-        sx={{ '& .MuiTextField-root': { m: 1, width: '55ch' } }}
+        sx={{ '& .MuiTextField-root': { m: 1, width: '50rem' } }}
         noValidate
         autoComplete="off"
       >
@@ -239,7 +242,7 @@ function AddAsset(props) {
           />
 
 
-          <div className="ag-theme-alpine" style={{width:"30rem", height: "20rem"}} >
+          <div className="ag-theme-alpine" style={{width:"50rem", height: "20rem"}} >
             <AgGridReact
               rowData={gridRows}
               columnDefs={props.colDefs}
@@ -258,6 +261,7 @@ function AddAsset(props) {
           </div>
         </div>
       </Box>
+    </div>
     </div>
   );
 }
