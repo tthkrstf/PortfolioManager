@@ -4,7 +4,8 @@
     line-height: 1.5;
     font-weight: 400;
     color-scheme: light dark;
-  
+    max-width: 1920px;
+    max-height: 1080px;
     font-synthesis: none;
     text-rendering: optimizeLegibility;
     -webkit-font-smoothing: antialiased;
@@ -28,6 +29,8 @@
     min-width: 320px;
     min-height: 100vh;
     background-color: rgba(255, 255, 255, 0.801);
+    max-width:1920px;
+    max-height: 1080px;
   }
   
   h1 {
@@ -131,8 +134,15 @@
     justify-content: center;
     color: white;
     font-weight: bold;
-    border: 1px solid rgba(255, 255, 255, 0.801);
+    border: none;
+    border: 1px solid rgba(255,255,255, 0.801);
     width: 100%;
+  }
+  .nav-container ul li:last-child{
+    border-bottom: 2px solid rgba(255,255,255, 0.801)
+  }
+  .nav-container ul li:first-child{
+    border-top: 2px solid rgba(255,255,255, 0.801)
   }
   
   /* Titles */

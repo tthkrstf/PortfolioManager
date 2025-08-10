@@ -101,8 +101,8 @@ function Charts(props) {
           </div>
           <div id="two-part-pie" class="pie-container">
             {/*<Button variant="outlined" onClick={handleClick}>Click this if you want to snort cocaine</Button> */}
-            <p class="title-style">Current stock holdings</p>
-             <PieChart colors={colorArray} series={[{data:props.mockData.portfolioData, innerRadius:50, outerRadius:100, }]}  width={250} height={250} sx={{ '& .MuiPieArc-root': {stroke: 'none'},
+            <p class="title-style">Current stock values</p>
+             <PieChart colors={colorArray} series={[{data:props.mockData.netPaidData, innerRadius:50, outerRadius:100, }]}  width={250} height={250} sx={{ '& .MuiPieArc-root': {stroke: 'none'},
               [`& .${pieArcLabelClasses.root}`]:{filter:'drop-shadow(1px 1px 2px black', animationName: 'animate-pie-arc-label', animationTimingFunction: 'linear', animationIterationCount: 'infinite',
                 animationDirection: 'alternate'}, [`& .${pieArcLabelClasses.root}.${pieArcLabelClasses.animate}`]: {animationDuration: '5s'}
 

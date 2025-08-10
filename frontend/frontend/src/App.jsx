@@ -95,6 +95,7 @@ function App() {
     const dataArray = [];
     const portfolioDataArray = [];
     const holdingsDataArray = [];
+    let netPaidArray = [];
     console.log(netPaid);
     if(data){
         for(let i = 0; i < data.length; i++){
@@ -111,8 +112,10 @@ function App() {
         portfolioDataArray.push(portfolioObj);
       }
    }
-   
-   const dataToPass = {symbolData: dataArray, portfolioData: portfolioDataArray, netPaidData: netPaid, holdingsData: holdingsDataArray };
+   if(netPaid){
+      netPaidArray = [{id:0, value:netPaid.netWorth, label: "Net Worth"}, {id:1, value: netPaid.paidAmount, label: "Paid Amount"}]
+   }
+   const dataToPass = {symbolData: dataArray, portfolioData: portfolioDataArray, netPaidData: netPaidArray, holdingsData: holdingsDataArray };
 
     return (
         <BrowserRouter>
