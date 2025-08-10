@@ -114,7 +114,7 @@ function Charts(props) {
           </div>
 
           <div class="bar-container">
-          <p class="title-style">Quotes</p>
+          <p class="title-style bar-title">Quotes</p>
           <BarChart
               yAxis={[{ scaleType: 'band', data: getLabels() }]}
               series={series}
