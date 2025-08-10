@@ -3,11 +3,13 @@ package com.restapi.restapi.dto;
 import com.restapi.restapi.common.Transaction;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.util.Date;
 
 @Data
 @AllArgsConstructor
+@NoArgsConstructor
 public class PortfolioDTO {
     private String symbol; // Stock symbol
     private double shares; // Number of shares purchased

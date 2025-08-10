@@ -5,7 +5,7 @@ import './App.css';
 import {getLastPriceUpdates} from './LastPriceUpdates.jsx';
 import Button from '@mui/material/Button';
 import {Charts} from './Charts.jsx';
-import {FrontPage} from './FrontPage.jsx';
+import {AssetTable} from './AssetTable.jsx';
 import ReactDOM from "react-dom/client";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import {Layout} from './Layout';
@@ -25,6 +25,13 @@ function getSymbolInfo(setData) {
 
 function getPortfolioInfo(setPortfolioData) {
   return fetch("http://localhost:8080/portfolio")
+    .then(res => res.json())
+    .then(portfolioData => setPortfolioData(portfolioData))
+    .catch(err => console.error(err));
+}
+
+export function getPortfolioHoldings(setPortfolioData) {
+  return fetch("http://localhost:8080/portfolio/holdings")
     .then(res => res.json())
     .then(portfolioData => setPortfolioData(portfolioData))
     .catch(err => console.error(err));
@@ -53,9 +60,18 @@ function App() {
     const [rowData, setRowData] = useState([]);
     const colDefs = [
             {headerName: "Company", field : "company"},
-            {headerName: "Quote", field : "quote"},
+            {headerName: "Current Price", field : "currentPrice"},
             {headerName: "News", field : "news"},
             {headerName: "Symbol", field : "symbol"},
+            ];
+    const colDefsForAssetTable = [
+            {headerName: "Company", field : "company"},
+            {headerName: "Current Price", field : "currentPrice"},
+            {headerName: "Shares", field : "shares"},
+            {headerName: "Total Worth", field : "totalWorth"},
+            {headerName: "Paid Amount", field : "paidAmount"},
+            {headerName: "Profit", field : "profit"},
+            {headerName: "Net Worth", field : "netWorth"},
             ];
 
 
@@ -86,15 +102,9 @@ function App() {
     const portfolioDataArray = [];
     if(data){
         for(let i = 0; i < data.length; i++){
-          console.log(data[i].currentPrice);
           const quoteObj = {id: i, value: data[i].highPriceOfDay, value2: data[i].lowPriceOfDay, segg: data[i].currentPrice, label: data[i].symbol }
           dataArray.push(quoteObj);
         }
-        
-
-
-
-
     }
     else{
        displayData = " ";
@@ -114,53 +124,12 @@ function App() {
               <Routes>
                 <Route path="/" element={<Layout />}>
                   <Route index element={<Charts mockData={dataToPass} />} />
-                  <Route path="assettable" element={<FrontPage data={companyDummyData} rowData={rowData} colDefs={colDefs} />} />
-                  <Route path="addasset" element={<AddAsset data={companyDummyData} rowData={rowData} colDefs={colDefs}/>} />
+                  <Route path="assettable" element={<AssetTable data={companyDummyData} rowData={rowData} colDefs={colDefsForAssetTable} />} />
+                  <Route path="addasset" element={<AddAsset rowData={rowData} colDefs={colDefs}/>} />
                 </Route>
               </Routes>
             </BrowserRouter>
     );
 }
-
-
-
-
-  //useEffect(() =>{setData(getLastPriceUpdates())});
-
-  //const colDefs = gridOptions.api.getColumnDefs();
- // colDefs.length=0;
-  //const keys = Object.keys(data[0])
-
-    //keys.forEach(key => colDefs.push({field : key}));
-    //gridOptions.api.setGridOption('columnDefs', colDefs);
-
-    // add the data to the grid
-    //gridOptions.api.setRowData('rowData', data);
-    //fetch("http://localhost:8080/tasks/greeting").then(asd => asd.json()).then(data => setData(data.message));
-    /*const socket = new WebSocket('wss://ws.finnhub.io?token=d28sfvpr01qle9gsjho0d28sfvpr01qle9gsjhog');
-
-       // Connection opened -> Subscribe
-       socket.addEventListener('open', function (event) {
-           socket.send(JSON.stringify({'type':'subscribe', 'symbol': 'AAPL'}))
-           socket.send(JSON.stringify({'type':'subscribe', 'symbol': 'BINANCE:BTCUSDT'}))
-           socket.send(JSON.stringify({'type':'subscribe', 'symbol': 'IC MARKETS:1'}))
-       });
-
-       // Listen for messages
-       socket.addEventListener('message', function (event) {
-           console.log('Message from server ', event.data);
-       });
-
-       // Unsubscribe
-        var unsubscribe = function(symbol) {
-           socket.send(JSON.stringify({'type':'unsubscribe','symbol': symbol}))
-       }
-        socket.close();
-        console.log(data);
-       return event.data;*/
-
-
-
-
 
 export default App

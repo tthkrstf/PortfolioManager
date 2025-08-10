@@ -73,12 +73,17 @@ function AddAsset(props) {
 
   const companyDummyData = props.data;
   const [selectedAssetCompany, setSelectedAssetCompany] = useState("");
-  const [selectedCompanyData, setSelectedCompanyData] = useState([]);
+  const [selectedCompanyData, setSelectedCompanyData] = useState({});
+  const gridRows = selectedCompanyData.company ? [selectedCompanyData] : [];
   const [rowData, setRowData] = useState([props.rowData]);
   const [inputValue, setInputValue] = useState(""); // shares
 
   const [companyInput, setCompanyInput] = useState("");
   const [debouncedInput, setDebouncedInput] = useState("");
+
+  const [selectedSymbol, setSelectedSymbol] = useState("");
+  const [quote, setQuote] = useState(null);
+  const [news, setNews] = useState([]);
 
   // Only saves the input from search bar, when 250ms is passed. After every stroke it reset the timer with the cleanup
   // function - clearTimeout(t). Reason is we don't need to update the companyInput only when the user stops typing.
@@ -120,18 +125,62 @@ function AddAsset(props) {
   }, [filteredAll.length]);
 
   // ?? checks if its undefined/null, this is for the table below. Setting the selected company and the info of said company.
-  const handleChangeCompany = (_event, value) => {
-    setSelectedAssetCompany(value || "");
-    setSelectedCompanyData(value ? (companyDummyData[value] ?? []) : []);
-  };
+  const handleChangeCompany = async (_event, value) => {
+    if (!value) {
+      setSelectedAssetCompany("");
+      setSelectedCompanyData({});
+      return;
+    }
+    setSelectedAssetCompany(value);
+    const symbol = stocks.find(s => s.description === value)?.symbol || "";
+    const today = new Date();
+    const year = today.getFullYear();
+    const month = String(today.getMonth()+1).padStart(2,'0');
+    const day = String(today.getDate()).padStart(2,'0');
+    const formattedDate = `${year}-${month}-${day}`;
 
+    try {
+      const formattedDate = new Date().toISOString().split("T")[0];
+
+      const [quoteRes, newsRes] = await Promise.all([
+        fetch(`http://localhost:8080/quote/${encodeURIComponent(symbol)}?date=${formattedDate}`),
+        fetch(`http://localhost:8080/company_news/${encodeURIComponent(symbol)}`)
+      ]);
+
+      if (!quoteRes.ok) throw new Error(`Quote HTTP ${quoteRes.status}`);
+      if (!newsRes.ok) throw new Error(`News HTTP ${newsRes.status}`);
+
+      const [quote, news] = await Promise.all([
+        quoteRes.json(),
+        newsRes.json()
+      ]);
+
+      const firstNews = Array.isArray(news) ? (news[0].summary ?? null) : null;
+
+      setSelectedCompanyData({
+        company: value,
+        symbol: symbol,
+        currentPrice: quote?.currentPrice ?? null,
+        news: firstNews
+      });
+
+    } catch (err) {
+      console.error("Error fetching quote/news:", err);
+      setSelectedCompanyData({
+        company: value,
+        symbol,
+        quote: null,
+        news: []
+      });
+    };
+  }
   // On the shares text field change, it sets the value for it
   const handleInput = (event) => setInputValue(event.target.value);
 
   // ? at the end mean, that if its undefined/null it will skip over it and not throw an error.
   const handleClick = () => {
     const payload = {
-      symbol: selectedCompanyData?.[0]?.symbol,
+      symbol: selectedCompanyData?.symbol || "",
       shares: inputValue
     };
 
@@ -162,7 +211,7 @@ function AddAsset(props) {
   //    renderInput: params here just mean for the styling, so just pass every styling option, value it has etc.
 
   return (
-    <div>
+    <div class="random">
       <h1> Add new asset </h1>
       <Box
         component="form"
@@ -192,7 +241,7 @@ function AddAsset(props) {
 
           <div className="ag-theme-alpine" style={{width:"30rem", height: "20rem"}} >
             <AgGridReact
-              rowData={selectedCompanyData}
+              rowData={gridRows}
               columnDefs={props.colDefs}
               defaultColDef={{flex : 1, minWidth : 100, resizable: true}}
             />

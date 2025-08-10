@@ -19,12 +19,14 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 
+import javax.sound.sampled.Port;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.time.LocalDate;
-import java.util.Arrays;
+import java.util.*;
 import java.sql.Date;
-import java.util.List;
 
 @Service
 public class FinanceDataService {
@@ -58,7 +60,6 @@ public class FinanceDataService {
             } catch(EmptyResultDataAccessException ex){
                 return null;
             }
-
         }
     }
 
@@ -129,14 +130,29 @@ public class FinanceDataService {
     }
 
     public List<CompanyNewsDTO> getCompanyNewsFromDB(String symbol){
-        try{
-            List<? extends CompanyNews> companyNews = jdbcTemplate.query("select * from company_news where related = ?",
-                    new Object[]{symbol}, new BeanPropertyRowMapper<>(CompanyNews.class));
-
-            return finnhubMapper.mapNews(companyNews);
-        } catch(EmptyResultDataAccessException e){
-            return null;
+        List<CompanyNewsDTO> companyNewsDTO = fetchCompanyNews(symbol);
+        boolean newForToday = checkCompanyNewsToday(symbol);
+        if(companyNewsDTO == null || companyNewsDTO.isEmpty() || !newForToday){
+            createCompanyNews(symbol);
+            companyNewsDTO = fetchCompanyNews(symbol);
         }
+        return companyNewsDTO;
+    }
+
+    public List<CompanyNewsDTO> fetchCompanyNews(String symbol){
+        List<? extends CompanyNews> companyNews = jdbcTemplate.query("select * from company_news where related = ?",
+                new Object[]{symbol}, new BeanPropertyRowMapper<>(CompanyNews.class));
+
+        return finnhubMapper.mapNews(companyNews);
+    }
+
+    public boolean checkCompanyNewsToday(String symbol){
+        List<? extends CompanyNews> companyNews = jdbcTemplate.query("select * from company_news where related = ? and datetime = CURDATE()",
+                new Object[]{symbol}, new BeanPropertyRowMapper<>(CompanyNews.class));
+
+        List<CompanyNewsDTO> mapped = finnhubMapper.mapNews(companyNews);
+
+        return mapped != null && !mapped.isEmpty();
     }
 
     @Transactional
@@ -259,24 +275,94 @@ public class FinanceDataService {
         return new StockDTO(stock);
     }
 
-    public boolean createPortfolio(PortfolioDTO portfolioDTO){
-        QuoteDTO quote = getQuoteFromDB(portfolioDTO.getSymbol(), LocalDate.now());
-        StockDTO stockDTO = getStockBySymbolFromDB(portfolioDTO.getSymbol());
+    public boolean createPortfolio(SharesDTO sharesDTO){
+        QuoteDTO quote = getQuoteFromDB(sharesDTO.getSymbol(), LocalDate.now());
+        StockDTO stockDTO = getStockBySymbolFromDB(sharesDTO.getSymbol());
 
         double currentPrice = quote.getCurrentPrice();
-        double shares = portfolioDTO.getShares();
+        double shares = sharesDTO.getShares();
 
         String sql = "INSERT INTO portfolio values(null, ?, ?, ?, CURDATE(), ?, ?)";
-        int rows = jdbcTemplate.update(sql, portfolioDTO.getSymbol(), currentPrice,
+        int rows = jdbcTemplate.update(sql, sharesDTO.getSymbol(), currentPrice,
                 shares, stockDTO.getCurrency(), Transaction.BUY.toString()
         );
         return rows == 1;
     }
 
-    public List<SharesDTO> getAllFromPortfolio() {
+    public List<SharesDTO> getAllSharesFromPortfolio() {
         String sql = "select symbol, sum(case when type = 'BUY' then shares when type = 'SELL' then -shares else 0 end) as shares from portfolio group by symbol";
         List<SharesDTO> shares = jdbcTemplate.query(sql, new Object[]{}, new BeanPropertyRowMapper<>(SharesDTO.class));
         return shares.isEmpty() ? null : shares;
+    }
+
+    public List<AssetTableDTO> getAllFromPortfolio() {
+        List<PortfolioDTO> portfolioDTO = fetchPortfolio();
+
+        return calculateFinancials(portfolioDTO);
+    }
+
+    private List<PortfolioDTO> fetchPortfolio(){
+        String sql = "select * from portfolio order by purchase_date";
+        List<PortfolioDTO> portfolioDTO = jdbcTemplate.query(sql, new Object[]{}, new BeanPropertyRowMapper<>(PortfolioDTO.class));
+        return portfolioDTO.isEmpty() ? null : portfolioDTO;
+    }
+
+    private List<AssetTableDTO> calculateFinancials(List<PortfolioDTO> portfolioDTO) {
+        Map<String, AssetTableDTO> assetMap = new HashMap<>();
+
+        for (PortfolioDTO dto : portfolioDTO) {
+            String symbol = dto.getSymbol();
+            String companyName = getStockBySymbolFromDB(symbol).getDescription();
+            Transaction type = dto.getType();
+            double shares = dto.getShares();
+            double price = dto.getPricePerShare();
+
+            AssetTableDTO assetDTO = assetMap.computeIfAbsent(symbol, k -> {
+                AssetTableDTO newAsset = new AssetTableDTO();
+                newAsset.setCompany(companyName);
+                newAsset.setSymbol(symbol);
+                newAsset.setShares(0);
+                newAsset.setPaidAmount(0);
+                newAsset.setProfit(0);
+                newAsset.setNetWorth(0);
+                return newAsset;
+            });
+
+            if (type == Transaction.BUY) {
+                assetDTO.setShares(assetDTO.getShares() + shares);
+                assetDTO.setPaidAmount(assetDTO.getPaidAmount() + (shares * price));
+
+            } else if (type == Transaction.SELL) {
+                double saleProceeds = shares * price;
+
+                double avgCostPerShare = assetDTO.getShares() > 0
+                        ? BigDecimal.valueOf(assetDTO.getPaidAmount())
+                        .divide(BigDecimal.valueOf(assetDTO.getShares()), 2, RoundingMode.HALF_UP)
+                        .doubleValue()
+                        : 0;
+
+                if(avgCostPerShare == 0){
+                    continue;
+                }
+
+                double costOfSoldShares = avgCostPerShare * shares;
+                double realizedProfit = saleProceeds - costOfSoldShares;
+
+                assetDTO.setProfit(assetDTO.getProfit() + realizedProfit);
+                assetDTO.setShares(assetDTO.getShares() - shares);
+                assetDTO.setPaidAmount(assetDTO.getPaidAmount() - costOfSoldShares);
+            }
+        }
+
+        for (AssetTableDTO asset : assetMap.values()) {
+            double currentPrice = getQuoteFromDB(asset.getSymbol(), LocalDate.now()).getCurrentPrice();
+            double totalWorth = asset.getShares() * currentPrice;
+            asset.setCurrentPrice(currentPrice);
+            asset.setTotalWorth(totalWorth);
+            asset.setNetWorth(totalWorth + asset.getProfit());
+        }
+
+        return new ArrayList<>(assetMap.values());
     }
 
     public List<String> getAllSymbolsFromPortfolio() {

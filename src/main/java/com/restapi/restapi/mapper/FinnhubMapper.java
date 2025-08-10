@@ -74,7 +74,7 @@ public class FinnhubMapper {
 
     public List<CompanyNewsDTO> mapNews(List<? extends CompanyNews> companyNews) {
         if (companyNews.isEmpty()) {
-            throw new IllegalArgumentException("Empty Company News provided!");
+            return null;
         }
 
         return companyNews.stream()
