@@ -31,10 +31,11 @@ export function getPortfolioInfo(setPortfolioData) {
     .catch(err => console.error(err));
 }
 
-export function getPortfolioHoldings(setPortfolioData) {
+export  function getPortfolioHoldings(setHoldingsData) {
+  console.log("dsa");
   return fetch("http://localhost:8080/portfolio/holdings")
     .then(res => res.json())
-    .then(portfolioData => setPortfolioData(portfolioData))
+    .then(holdingsData => setHoldingsData(holdingsData))
     .catch(err => console.error(err));
 }
 
@@ -44,7 +45,7 @@ function setUpdateQuotes() {
 }
 
 
-function getAdditionalPortfolioInfo(setNetPaid){
+ function getAdditionalPortfolioInfo(setNetPaid){
   console.log("asd");
   return fetch("http://localhost:8080/portfolio/netPaid").then(res => res.json()).then(netPaid => setNetPaid(netPaid)).catch(err => console.error(err));
 
@@ -52,6 +53,7 @@ function getAdditionalPortfolioInfo(setNetPaid){
 function App() {
     const [data, setData] = useState([]);
     const [portfolioData, setPortfolioData] = useState([]);
+    const [holdingsData, setHoldingsData] = useState([]);
   const [netPaid, setNetPaid] = useState([]);
     
     useEffect(() => {
@@ -59,7 +61,7 @@ function App() {
         await getSymbolInfo(setData);
         await getPortfolioInfo(setPortfolioData);
         await setUpdateQuotes();
-        await getPortfolioHoldings(setPortfolioData)
+        await getPortfolioHoldings(setHoldingsData);
         await getAdditionalPortfolioInfo(setNetPaid);
       })();
     }, []);
