@@ -94,6 +94,8 @@ function App() {
 
     const dataArray = [];
     const portfolioDataArray = [];
+    const holdingsDataArray = [];
+    console.log(netPaid);
     if(data){
         for(let i = 0; i < data.length; i++){
           const quoteObj = {id: i, value: data[i].highPriceOfDay, value2: data[i].lowPriceOfDay, segg: data[i].currentPrice, label: data[i].symbol }
@@ -110,7 +112,7 @@ function App() {
       }
    }
    
-   const dataToPass = {symbolData: dataArray, portfolioData: portfolioDataArray};
+   const dataToPass = {symbolData: dataArray, portfolioData: portfolioDataArray, netPaidData: netPaid, holdingsData: holdingsDataArray };
 
     return (
         <BrowserRouter>
