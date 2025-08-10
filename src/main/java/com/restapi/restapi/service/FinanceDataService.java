@@ -377,6 +377,7 @@ public class FinanceDataService {
                         .divide(BigDecimal.valueOf(assetDTO.getShares()), 2, RoundingMode.HALF_UP)
                         : BigDecimal.ZERO;
 
+                assetDTO.setShares(assetDTO.getShares() - shares.doubleValue());
                 if (avgCostPerShare.compareTo(BigDecimal.ZERO) == 0) {
                     continue;
                 }
@@ -391,7 +392,6 @@ public class FinanceDataService {
                                 .doubleValue()
                 );
 
-                assetDTO.setShares(assetDTO.getShares() - shares.doubleValue());
                 assetDTO.setPaidAmount(
                         BigDecimal.valueOf(assetDTO.getPaidAmount())
                                 .subtract(costOfSoldShares)

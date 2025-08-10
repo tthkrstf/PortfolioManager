@@ -1,8 +1,55 @@
 import {pieArcLabelClasses, PieChart} from '@mui/x-charts/PieChart';
+import { useEffect, useState } from 'react'
 import { BarChart } from '@mui/x-charts/BarChart';
 import'./style.css'
+import {getSymbolInfo, getPortfolioInfo, getPortfolioHoldings, setUpdateQuotes, getAdditionalPortfolioInfo} from "./App"
+
 function Charts(props) {
-  console.log(props.mockData.portfolioData);
+    const [data, setData] = useState([]);
+    const [portfolioData, setPortfolioData] = useState([]);
+    const [holdingsData, setHoldingsData] = useState([]);
+  const [netPaid, setNetPaid] = useState([]);
+
+  useEffect(() => {
+  const fetchAll = async () => {
+    setUpdateQuotes().catch(() => {});
+
+    await Promise.all([
+      getSymbolInfo(setData),
+      getPortfolioInfo(setPortfolioData),
+      getPortfolioHoldings(setHoldingsData),
+      getAdditionalPortfolioInfo(setNetPaid),
+    ]);
+  };
+
+  fetchAll();
+  const id = setInterval(fetchAll, 5000);
+  return () => { clearInterval(id); };
+}, []);
+
+  const dataArray = [];
+  const portfolioDataArray = [];
+  const holdingsDataArray = [];
+  let netPaidArray = [];
+  if(data){
+      for(let i = 0; i < data.length; i++){
+        const quoteObj = {id: i, value: data[i].highPriceOfDay, value2: data[i].lowPriceOfDay, value3: data[i].currentPrice, label: data[i].symbol }
+        dataArray.push(quoteObj);
+      }
+  }
+ if (portfolioData){
+    for(let i = 0; i < portfolioData.length; i++){
+      const portfolioObj = {id: i, value:portfolioData[i].shares, label:portfolioData[i].symbol};
+      portfolioDataArray.push(portfolioObj);
+    }
+ }
+ if(netPaid){
+    netPaidArray = [{id:0, value:netPaid.netWorth, label: "Net Worth"}, {id:1, value: netPaid.paidAmount, label: "Paid Amount"}]
+ }
+ const dataToPass = {symbolData: dataArray, portfolioData: portfolioDataArray, netPaidData: netPaidArray, holdingsData: holdingsDataArray };
+
+
+
   let colorArray = [
     "rgb(192, 229, 45)",
     "rgb(229, 45, 222)",
@@ -58,26 +105,25 @@ function Charts(props) {
   
   function getLabels(){
     let labelArray  = [];
-    for(let i = 0; i<props.mockData.symbolData.length; i++){
-      
-      labelArray.push(props.mockData.symbolData[i].label);
+    for(let i = 0; i<dataToPass.symbolData.length; i++){
+        labelArray.push(dataToPass.symbolData[i].label);
     }
     return labelArray;
   }
  
   const series = [{
-    data: props.mockData.symbolData.map(item => item.value),
+    data: dataToPass.symbolData.map(item => item.value),
     label: 'Highest Price Today',
     color: "rgb(42, 166, 248)"
   },
   
   {
-    data:props.mockData.symbolData.map(item => item.value2),
+    data:dataToPass.symbolData.map(item => item.value2),
     label: 'Lowest Price Today',
     color: "rgb(218, 70, 70)"
   },
   {
-    data:props.mockData.symbolData.map(item => item.segg),
+    data:dataToPass.symbolData.map(item => item.value3),
     label: 'Current Price',
     color: "rgb(0, 255, 13)"
   }
@@ -89,7 +135,7 @@ function Charts(props) {
           <div class="pie-container">
             {/*<Button variant="outlined" onClick={handleClick}>Click this if you want to snort cocaine</Button> */}
             <p class="title-style">Current stock holdings</p>
-             <PieChart colors={colorArray} series={[{data:props.mockData.portfolioData, innerRadius:50, outerRadius:100, }]}  width={250} height={250} sx={{ '& .MuiPieArc-root': {stroke: 'none'},
+             <PieChart colors={colorArray} series={[{data:dataToPass.portfolioData, innerRadius:50, outerRadius:100, }]}  width={250} height={250} sx={{ '& .MuiPieArc-root': {stroke: 'none'},
               [`& .${pieArcLabelClasses.root}`]:{filter:'drop-shadow(1px 1px 2px black', animationName: 'animate-pie-arc-label', animationTimingFunction: 'linear', animationIterationCount: 'infinite',
                 animationDirection: 'alternate'}, [`& .${pieArcLabelClasses.root}.${pieArcLabelClasses.animate}`]: {animationDuration: '5s'}
 
@@ -102,7 +148,7 @@ function Charts(props) {
           <div id="two-part-pie" class="pie-container">
             {/*<Button variant="outlined" onClick={handleClick}>Click this if you want to snort cocaine</Button> */}
             <p class="title-style">Current stock values</p>
-             <PieChart colors={colorArray} series={[{data:props.mockData.netPaidData, innerRadius:50, outerRadius:100, }]}  width={250} height={250} sx={{ '& .MuiPieArc-root': {stroke: 'none'},
+             <PieChart colors={colorArray} series={[{data:dataToPass.netPaidData, innerRadius:50, outerRadius:100, }]}  width={250} height={250} sx={{ '& .MuiPieArc-root': {stroke: 'none'},
               [`& .${pieArcLabelClasses.root}`]:{filter:'drop-shadow(1px 1px 2px black', animationName: 'animate-pie-arc-label', animationTimingFunction: 'linear', animationIterationCount: 'infinite',
                 animationDirection: 'alternate'}, [`& .${pieArcLabelClasses.root}.${pieArcLabelClasses.animate}`]: {animationDuration: '5s'}
 
