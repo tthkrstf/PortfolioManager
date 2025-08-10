@@ -93,26 +93,17 @@ public class FinanceDataService {
     }
 
     //PUT
-    public boolean putQuote(QuoteDTO quoteDTO, final String symbol){
-        QuoteDTO existing = getQuote(symbol);
+    public boolean putQuote(QuoteDTO quoteDTO){
+        QuoteDTO existing = getQuote(quoteDTO.getSymbol());
 
         if(existing == null){
             return false;
         }
 
         if(quoteDTO.getCurrentPrice() != 0) existing.setCurrentPrice(quoteDTO.getCurrentPrice());
-        if(quoteDTO.getChanges() != 0) existing.setChanges(quoteDTO.getChanges());
-        if(quoteDTO.getPercentChange() != 0) existing.setPercentChange(quoteDTO.getCurrentPrice());
-        if(quoteDTO.getHighPriceOfDay() != 0) existing.setHighPriceOfDay(quoteDTO.getHighPriceOfDay());
-        if(quoteDTO.getLowPriceOfDay() != 0) existing.setLowPriceOfDay(quoteDTO.getLowPriceOfDay());
-        if(quoteDTO.getOpenPriceOfDay() != 0) existing.setOpenPriceOfDay(quoteDTO.getOpenPriceOfDay());
-        if(quoteDTO.getPrevClosePrice() != 0) existing.setPrevClosePrice(quoteDTO.getPrevClosePrice());
 
-        String sql = "UPDATE quote set currentPrice = ?, changes = ?, percent_change = ?, high_price_of_day = ?, low_price_of_day = ?, open_price_of_day = ?," +
-                "prev_close_price = ?, creation_date = CURDATE() where symbol = ?";
-        int rows = jdbcTemplate.update(sql, existing.getCurrentPrice(), existing.getChanges(),
-                existing.getPercentChange(), existing.getHighPriceOfDay(), existing.getLowPriceOfDay(), existing.getOpenPriceOfDay(),
-                existing.getPrevClosePrice(), symbol);
+        String sql = "UPDATE quote set currentPrice = ? where symbol = ? and creation_date = CURDATE()";
+        int rows = jdbcTemplate.update(sql, existing.getCurrentPrice(), quoteDTO.getSymbol());
 
         return rows == 1;
     }
@@ -295,14 +286,48 @@ public class FinanceDataService {
         return shares.isEmpty() ? null : shares;
     }
 
+    public List<SharesDTO> getAllSharesFromPortfolioPrices() {
+        String sql = "select symbol, sum(case when type = 'BUY' then shares when type = 'SELL' then -shares else 0 end) as shares from portfolio group by symbol";
+        List<SharesDTO> shares = jdbcTemplate.query(sql, new Object[]{}, new BeanPropertyRowMapper<>(SharesDTO.class));
+        if (shares.isEmpty()) {
+            return null;
+        }
+
+        for (SharesDTO dto : shares) {
+            double currentPrice = getQuoteFromDB(dto.getSymbol(), LocalDate.now()).getCurrentPrice();
+            double result = dto.getShares() * currentPrice;
+            dto.setShares(result);
+        }
+
+
+        return shares;
+    }
+
     public List<AssetTableDTO> getAllFromPortfolio() {
         List<PortfolioDTO> portfolioDTO = fetchPortfolio();
 
         return calculateFinancials(portfolioDTO);
     }
 
+    public NetPaidDTO getNetAndPaid(){
+        List<AssetTableDTO> assetTableDTO = getAllFromPortfolio();
+
+        BigDecimal totalPaid = BigDecimal.ZERO;
+        BigDecimal totalNetWorth = BigDecimal.ZERO;
+
+        for (AssetTableDTO dto : assetTableDTO) {
+            totalPaid = totalPaid.add(BigDecimal.valueOf(dto.getPaidAmount()));
+            totalNetWorth = totalNetWorth.add(BigDecimal.valueOf(dto.getNetWorth()));
+        }
+
+        totalPaid = totalPaid.setScale(2, RoundingMode.HALF_UP);
+        totalNetWorth = totalNetWorth.setScale(2, RoundingMode.HALF_UP);
+
+        return new NetPaidDTO(totalNetWorth, totalPaid);
+    }
+
     private List<PortfolioDTO> fetchPortfolio(){
-        String sql = "select * from portfolio order by purchase_date";
+        String sql = "select * from portfolio where symbol like 'MSFT' order by purchase_date";
         List<PortfolioDTO> portfolioDTO = jdbcTemplate.query(sql, new Object[]{}, new BeanPropertyRowMapper<>(PortfolioDTO.class));
         return portfolioDTO.isEmpty() ? null : portfolioDTO;
     }
@@ -314,8 +339,8 @@ public class FinanceDataService {
             String symbol = dto.getSymbol();
             String companyName = getStockBySymbolFromDB(symbol).getDescription();
             Transaction type = dto.getType();
-            double shares = dto.getShares();
-            double price = dto.getPricePerShare();
+            BigDecimal shares = BigDecimal.valueOf(dto.getShares());
+            BigDecimal price = BigDecimal.valueOf(dto.getPricePerShare());
 
             AssetTableDTO assetDTO = assetMap.computeIfAbsent(symbol, k -> {
                 AssetTableDTO newAsset = new AssetTableDTO();
@@ -329,37 +354,58 @@ public class FinanceDataService {
             });
 
             if (type == Transaction.BUY) {
-                assetDTO.setShares(assetDTO.getShares() + shares);
-                assetDTO.setPaidAmount(assetDTO.getPaidAmount() + (shares * price));
+                assetDTO.setShares(assetDTO.getShares() + shares.doubleValue());
+
+                BigDecimal paid = BigDecimal.valueOf(assetDTO.getPaidAmount())
+                        .add(shares.multiply(price))
+                        .setScale(2, RoundingMode.HALF_UP);
+                assetDTO.setPaidAmount(paid.doubleValue());
 
             } else if (type == Transaction.SELL) {
-                double saleProceeds = shares * price;
+                BigDecimal saleProceeds = shares.multiply(price).setScale(2, RoundingMode.HALF_UP);
 
-                double avgCostPerShare = assetDTO.getShares() > 0
+                BigDecimal avgCostPerShare = assetDTO.getShares() > 0
                         ? BigDecimal.valueOf(assetDTO.getPaidAmount())
                         .divide(BigDecimal.valueOf(assetDTO.getShares()), 2, RoundingMode.HALF_UP)
-                        .doubleValue()
-                        : 0;
+                        : BigDecimal.ZERO;
 
-                if(avgCostPerShare == 0){
+                if (avgCostPerShare.compareTo(BigDecimal.ZERO) == 0) {
                     continue;
                 }
 
-                double costOfSoldShares = avgCostPerShare * shares;
-                double realizedProfit = saleProceeds - costOfSoldShares;
+                BigDecimal costOfSoldShares = avgCostPerShare.multiply(shares).setScale(2, RoundingMode.HALF_UP);
+                BigDecimal realizedProfit = saleProceeds.subtract(costOfSoldShares).setScale(2, RoundingMode.HALF_UP);
 
-                assetDTO.setProfit(assetDTO.getProfit() + realizedProfit);
-                assetDTO.setShares(assetDTO.getShares() - shares);
-                assetDTO.setPaidAmount(assetDTO.getPaidAmount() - costOfSoldShares);
+                assetDTO.setProfit(
+                        BigDecimal.valueOf(assetDTO.getProfit())
+                                .add(realizedProfit)
+                                .setScale(2, RoundingMode.HALF_UP)
+                                .doubleValue()
+                );
+
+                assetDTO.setShares(assetDTO.getShares() - shares.doubleValue());
+                assetDTO.setPaidAmount(
+                        BigDecimal.valueOf(assetDTO.getPaidAmount())
+                                .subtract(costOfSoldShares)
+                                .setScale(2, RoundingMode.HALF_UP)
+                                .doubleValue()
+                );
             }
         }
 
         for (AssetTableDTO asset : assetMap.values()) {
-            double currentPrice = getQuoteFromDB(asset.getSymbol(), LocalDate.now()).getCurrentPrice();
-            double totalWorth = asset.getShares() * currentPrice;
-            asset.setCurrentPrice(currentPrice);
-            asset.setTotalWorth(totalWorth);
-            asset.setNetWorth(totalWorth + asset.getProfit());
+            BigDecimal currentPrice = BigDecimal.valueOf(getQuoteFromDB(asset.getSymbol(), LocalDate.now()).getCurrentPrice());
+            BigDecimal totalWorth = BigDecimal.valueOf(asset.getShares())
+                    .multiply(currentPrice)
+                    .setScale(2, RoundingMode.HALF_UP);
+
+            asset.setCurrentPrice(currentPrice.setScale(2, RoundingMode.HALF_UP).doubleValue());
+            asset.setTotalWorth(totalWorth.doubleValue());
+            asset.setNetWorth(
+                    totalWorth.add(BigDecimal.valueOf(asset.getProfit()))
+                            .setScale(2, RoundingMode.HALF_UP)
+                            .doubleValue()
+            );
         }
 
         return new ArrayList<>(assetMap.values());

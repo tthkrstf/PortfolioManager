@@ -74,30 +74,6 @@ function App() {
             {headerName: "Net Worth", field : "netWorth"},
             ];
 
-
-
-    const companyDummyData = {
-        Apple: [{
-            company: "Apple",
-            quote: 90,
-            news: "hello apple",
-            symbol: "AAPL"
-            }],
-        Microsoft: [{
-            company: "Microsoft",
-            quote: 83,
-            news: "hello microsoft",
-            symbol: "MSFT"
-            }],
-        Volkswagen: [{
-            company: "Volkswagen",
-            quote: 83,
-            news: "hello volkswagen",
-            symbol: "TVE"
-            }],
-        };
-
-
     const dataArray = [];
     const portfolioDataArray = [];
     if(data){
@@ -117,14 +93,13 @@ function App() {
    }
    
    const dataToPass = {symbolData: dataArray, portfolioData: portfolioDataArray};
-   
-  
+
     return (
         <BrowserRouter>
               <Routes>
                 <Route path="/" element={<Layout />}>
                   <Route index element={<Charts mockData={dataToPass} />} />
-                  <Route path="assettable" element={<AssetTable data={companyDummyData} rowData={rowData} colDefs={colDefsForAssetTable} />} />
+                  <Route path="assettable" element={<AssetTable colDefs={colDefsForAssetTable} />} />
                   <Route path="addasset" element={<AddAsset rowData={rowData} colDefs={colDefs}/>} />
                 </Route>
               </Routes>

@@ -108,11 +108,27 @@ public class FinanceDataController {
     }
 
     // FROM DB
+    @GetMapping("/portfolio/byPrices")
+    public ResponseEntity<List<SharesDTO>> getPortfolioSharesPrices(){
+        List<SharesDTO> sharesDTO = finService.getAllSharesFromPortfolioPrices();
+
+        return sharesDTO.isEmpty() ? ResponseEntity.noContent().build() : ResponseEntity.ok(sharesDTO);
+    }
+
+    // FROM DB
     @GetMapping("/portfolio/holdings")
     public ResponseEntity<List<AssetTableDTO>> getPortfolioHoldings(){
         List<AssetTableDTO> assetTableDTO = finService.getAllFromPortfolio();
 
         return assetTableDTO.isEmpty() ? ResponseEntity.noContent().build() : ResponseEntity.ok(assetTableDTO);
+    }
+
+    // FROM DB
+    @GetMapping("/portfolio/netPaid")
+    public ResponseEntity<NetPaidDTO> getNetWorthAndPaid(){
+        NetPaidDTO netPaidDTO = finService.getNetAndPaid();
+
+        return netPaidDTO == null ? ResponseEntity.noContent().build() : ResponseEntity.ok(netPaidDTO);
     }
 
     // FROM DB
@@ -126,8 +142,8 @@ public class FinanceDataController {
 
     // FROM DB
     @PutMapping("/quote")
-    public ResponseEntity<String> getSymbolsFromPortfolio(){
-        boolean success = finService.updateQuotesForExistingStocks();
+    public ResponseEntity<String> getSymbolsFromPortfolio(@RequestBody QuoteDTO quoteDTO){
+        boolean success = finService.putQuote(quoteDTO);
 
         return success ? ResponseEntity.ok("Success!") :
                 ResponseEntity.status(HttpStatus.NOT_FOUND).body("Couldn't update one or more stocks current price!");
