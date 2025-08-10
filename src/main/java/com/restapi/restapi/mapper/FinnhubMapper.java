@@ -116,7 +116,7 @@ public class FinnhubMapper {
 
     public List<StockDTO> mapStocksFromStock(List<Stock> stocks) {
         if (stocks.isEmpty()) {
-            throw new IllegalArgumentException("Got empty stock list!");
+            return null;
         }
 
         return stocks.stream()
