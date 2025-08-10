@@ -150,21 +150,20 @@ public class FinanceDataService {
     public boolean createCompanyNews(String symbol){
         List<CompanyNewsDTO> companyNewsDTO = this.getCompanyNews(symbol);
 
-        String sql = "INSERT IGNORE INTO company_news values(?, ?, ?, ?, ?, " +
-                "?, ?, ?, ?)";
+        String sql = "INSERT INTO company_news values(?, ?, ?, ?, ?, ?, ?, ?, ?, null)";
         int[] rows = jdbcTemplate.batchUpdate(sql, new BatchPreparedStatementSetter() {
             @Override
             public void setValues(PreparedStatement ps, int i) throws SQLException {
                 CompanyNewsDTO news = companyNewsDTO.get(i);
-                ps.setInt(1, news.getId());
-                ps.setString(2, news.getCategory());
-                ps.setString(3, news.getRelated());
-                ps.setDate(4, news.getDatetime());
-                ps.setString(5, news.getHeadline());
-                ps.setString(6, news.getImage());
-                ps.setString(7, news.getSource());
-                ps.setString(8, news.getSummary());
-                ps.setString(9, news.getUrl());
+                ps.setString(1, news.getCategory());
+                ps.setString(2, news.getRelated());
+                ps.setDate(3, news.getDatetime());
+                ps.setString(4, news.getHeadline());
+                ps.setString(5, news.getImage());
+                ps.setString(6, news.getSource());
+                ps.setString(7, news.getSummary());
+                ps.setString(8, news.getUrl());
+                ps.setInt(9, news.getId());
             }
 
             @Override
@@ -208,7 +207,7 @@ public class FinanceDataService {
 
     public List<StockDTO> getAllStocksFromDB() {
         List<StockDTO> stockDTO = fetchAllStocks();
-        if(stockDTO.isEmpty()){
+        if(stockDTO == null || stockDTO.isEmpty()){
             createStock();
             stockDTO = fetchAllStocks();
         }
@@ -228,6 +227,7 @@ public class FinanceDataService {
     public List<StockDTO> fetchAllStocks() {
         List<Stock> stocks = jdbcTemplate.query("select * from stock",
                 new Object[]{}, new BeanPropertyRowMapper<>(Stock.class));
+
         return finnhubMapper.mapStocksFromStock(stocks);
     }
 
@@ -306,11 +306,18 @@ public class FinanceDataService {
     public List<AssetTableDTO> getAllFromPortfolio() {
         List<PortfolioDTO> portfolioDTO = fetchPortfolio();
 
+        if(portfolioDTO == null){
+            return null;
+        }
+
         return calculateFinancials(portfolioDTO);
     }
 
     public NetPaidDTO getNetAndPaid(){
         List<AssetTableDTO> assetTableDTO = getAllFromPortfolio();
+        if(assetTableDTO == null){
+            return null;
+        }
 
         BigDecimal totalPaid = BigDecimal.ZERO;
         BigDecimal totalNetWorth = BigDecimal.ZERO;
@@ -327,7 +334,7 @@ public class FinanceDataService {
     }
 
     private List<PortfolioDTO> fetchPortfolio(){
-        String sql = "select * from portfolio where symbol like 'MSFT' order by purchase_date";
+        String sql = "select * from portfolio order by purchase_date";
         List<PortfolioDTO> portfolioDTO = jdbcTemplate.query(sql, new Object[]{}, new BeanPropertyRowMapper<>(PortfolioDTO.class));
         return portfolioDTO.isEmpty() ? null : portfolioDTO;
     }

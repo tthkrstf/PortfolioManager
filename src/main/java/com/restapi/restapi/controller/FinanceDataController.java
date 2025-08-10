@@ -120,7 +120,7 @@ public class FinanceDataController {
     public ResponseEntity<List<AssetTableDTO>> getPortfolioHoldings(){
         List<AssetTableDTO> assetTableDTO = finService.getAllFromPortfolio();
 
-        return assetTableDTO.isEmpty() ? ResponseEntity.noContent().build() : ResponseEntity.ok(assetTableDTO);
+        return assetTableDTO == null || assetTableDTO.isEmpty() ? ResponseEntity.noContent().build() : ResponseEntity.ok(assetTableDTO);
     }
 
     // FROM DB
