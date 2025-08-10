@@ -19,7 +19,7 @@ function AssetTable({ colDefs }) {
   }, []);
 
   return (
-    <div className="random">
+    <div class="add-table">
       <h1>Asset Table</h1>
       <div
         className="ag-theme-alpine"

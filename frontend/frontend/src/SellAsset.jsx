@@ -245,7 +245,7 @@ function SellAsset(props) {
   //    renderInput: params here just mean for the styling, so just pass every styling option, value it has etc.
 
   return (
-    <div class="random">
+    <div class="add-table">
       <h1> Add new asset </h1>
       <Box
         component="form"
