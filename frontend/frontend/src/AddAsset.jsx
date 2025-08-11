@@ -224,7 +224,7 @@ function AddAsset(props) {
 
   return (
     <div >
-    <div class="add-table" >
+    <div class="add-table" style={{width: '70rem', height: '40rem'}} >
       <h1> Add new asset </h1>
       <Box 
         

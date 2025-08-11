@@ -273,7 +273,7 @@ function SellAsset(props) {
           />
 
 
-          <div className="ag-theme-alpine" style={{width:"30rem", height: "20rem"}} >
+          <div className="ag-theme-alpine" style={{width:"70rem", height: "40rem"}} >
             <AgGridReact
               rowData={gridRows}
               columnDefs={props.colDefs}
