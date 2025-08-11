@@ -23,7 +23,7 @@ function AssetTable({ colDefs }) {
       <h1>Asset Table</h1>
       <div
         className="ag-theme-alpine"
-        style={{ width: "70rem", height: "32rem" }}
+        style={{ width: "70rem", height: "40rem" }}
       >
         <AgGridReact
           rowData={rows}
