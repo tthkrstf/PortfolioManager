@@ -122,7 +122,8 @@ function Charts(props) {
   const series = [{
     data: dataToPass.symbolData.map(item => item.value),
     label: 'Highest Price Today',
-    color: "rgb(42, 166, 248)"
+    color: "rgb(42, 224, 248)",
+    
   },
   
   {
@@ -149,7 +150,7 @@ function Charts(props) {
               [`& .${pieArcLabelClasses.root}`]:{filter:'drop-shadow(1px 1px 2px black', animationName: 'animate-pie-arc-label', animationTimingFunction: 'linear', animationIterationCount: 'infinite',
                 animationDirection: 'alternate'}, [`& .${pieArcLabelClasses.root}.${pieArcLabelClasses.animate}`]: {animationDuration: '5s'}
 
-             }} slotProps={{legend: {direction: 'horizontal', position:{vertical: 'bottom', horizontal: 'center'} }}} />
+             }} slotProps={{legend: {sx:{color:'white'} , direction: 'horizontal',  position:{vertical: 'bottom', horizontal: 'center'} }, }} />
             
 
            {/*<pre>{displayData}</pre>*/ }
@@ -164,7 +165,7 @@ function Charts(props) {
               [`& .${pieArcLabelClasses.root}`]:{filter:'drop-shadow(1px 1px 2px black', animationName: 'animate-pie-arc-label', animationTimingFunction: 'linear', animationIterationCount: 'infinite',
                 animationDirection: 'alternate'}, [`& .${pieArcLabelClasses.root}.${pieArcLabelClasses.animate}`]: {animationDuration: '5s'}
 
-             }} slotProps={{legend: {direction: 'horizontal', position:{vertical: 'bottom', horizontal: 'center'} }}} />
+             }} slotProps={{legend: {sx:{color:'white'} , direction: 'horizontal',  position:{vertical: 'bottom', horizontal: 'center'} }, }} />
             
 
            {/*<pre>{displayData}</pre>*/ }
@@ -175,8 +176,11 @@ function Charts(props) {
 
           <p class="title-style">Daily pricings</p>
           <BarChart
-              yAxis={[{ scaleType: 'band', data: getLabels() }]}
+              yAxis={[{ scaleType: 'band', data: getLabels(), tickLabelStyle: {fill: '#ffffff'}, labelStyle: {fill: '#ffffff'} }]}
+              xAxis={[{tickLabelStyle: {fill: '#ffffff'}}]}
               series={series}
+              
+             
               height={500}
               width={700}
               layout="horizontal"
@@ -185,7 +189,7 @@ function Charts(props) {
                 '& .MuiPieArc-root': {stroke: 'none'},
               }}
               borderRadius={5}
-              slotProps={{tooltip: {trigger: 'axis'}, axisTickLabel:{style:{color: 'rgb(255,255,255)'}}, axisLine:{style:{color: 'rgb(255,255,255)', stroke:'rgb(212, 200, 200)', strokeWidth:2}}, axisTick:{style:{stroke:'rgb(173, 164, 164)', strokeWidth:2}}}}
+              slotProps={{ legend:{sx:{color:'white', fontSize:16, fontFamily:'Arial'}} ,tooltip: {trigger: 'axis'}, axisTickLabel:{style:{color: 'rgb(255,255,255)'}}, axisLine:{style:{color: 'rgb(255,255,255)', stroke:'rgb(212, 200, 200)', strokeWidth:2}}, label:{style:{fill: '#ffffff'}},axisTick:{style:{stroke:'rgb(173, 164, 164)', strokeWidth:2}}}}
               
 
 
